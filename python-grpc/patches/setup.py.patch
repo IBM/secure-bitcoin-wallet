@@ -1,0 +1,20 @@
+--- setup.py.orig	2018-05-19 05:52:43.745714044 +0000
++++ setup.py	2018-05-19 06:13:32.865892802 +0000
+@@ -35,7 +35,7 @@ egg_info.manifest_maker.template = 'PYTH
+ PY3 = sys.version_info.major == 3
+ PYTHON_STEM = os.path.join('src', 'python', 'grpcio')
+ CORE_INCLUDE = ('include', '.',)
+-BORINGSSL_INCLUDE = (os.path.join('third_party', 'boringssl', 'include'),)
++BORINGSSL_INCLUDE = (os.path.join('third_party', 'openssl', 'include'),)
+ ZLIB_INCLUDE = (os.path.join('third_party', 'zlib'),)
+ CARES_INCLUDE = (
+     os.path.join('third_party', 'cares'),
+@@ -207,7 +207,7 @@ def cython_extensions_and_necessity():
+   prefix = 'libs/' + config + '/'
+   if "darwin" in sys.platform:
+     extra_objects = [prefix + 'libares.a',
+-                     prefix + 'libboringssl.a',
++                     prefix + 'libssl.a',
+                      prefix + 'libgpr.a',
+                      prefix + 'libgrpc.a']
+     core_c_files = []

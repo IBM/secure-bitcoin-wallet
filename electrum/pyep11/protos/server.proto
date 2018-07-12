@@ -1,0 +1,255 @@
+/*
+Copyright IBM Corp. 2016 All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+syntax = "proto3";
+
+package grep11protos;
+
+import "pkcs11.proto";
+
+/******* RANDOM ***********/
+message GenerateRandomInfo {
+	uint64 Len = 1;
+}
+
+message GenerateRandomStatus {
+	bytes Rnd = 1;
+}
+
+/******* DIGEST ***********/
+message DigestInitInfo {
+	Mechanism Mech = 1;
+}
+
+message DigestState {
+	bytes StateOut = 1;
+}
+message DigestOut {
+	bytes Digest = 1;
+}
+
+message DigestData {
+	bytes StateIn = 1;
+	bytes DataIn = 2;
+}
+
+message DigestKeyInfo {
+	bytes StateIn = 1;
+	bytes Key = 2;
+}
+
+message DigestSingleInfo {
+	Mechanism Mech = 1;
+	bytes DataIn = 2;
+}
+
+/******* CIPHER ***********/
+message CipherInitInfo {
+	Mechanism Mech = 1;
+	bytes Key = 2;
+}
+
+message CipherState {
+	bytes StateOut = 1;
+	bytes DataOut = 2;
+}
+
+message CipherData {
+	bytes StateIn = 1;
+	bytes DataIn = 2;
+}
+
+message CipherDataSingle {
+	Mechanism Mech = 1;
+	bytes Key = 2;
+	bytes DataIn = 3;
+}
+
+/******* SIGNATURE ***********/
+message SignatureInitInfo {
+	Mechanism Mech = 1;
+	bytes PrivKey = 2;
+}
+
+message SignatureState {
+	bytes State = 1;
+}
+
+message SignatureData {
+	bytes State = 1;
+	bytes Data = 2;
+}
+
+message SignFinalInfo {
+	bytes State = 1;
+}
+
+message VerifyFinalInfo {
+	bytes State = 1;
+	bytes Signature = 2;
+}
+
+message Signature {
+	bytes Signature = 1;
+}
+
+message VerifyStatus {
+	bool valid = 1;
+	string error = 2;
+}
+
+message VerifyIn {
+	bytes State = 1;
+	bytes Data = 2;
+	bytes Signature = 3;
+}
+
+message SignSingleInfo {
+	bytes PrivKey = 1;
+	Mechanism Mech = 2;
+	bytes Data = 3;
+}
+
+message VerifySingleInfo {
+	bytes PubKey = 1;
+	Mechanism Mech = 2;
+	bytes Data = 3;
+	bytes Signature = 4;
+}
+
+message VerifyInitInfo {
+	Mechanism Mech = 1;
+	bytes PubKey = 2;
+}
+
+/******* KEY Operations ***********/
+message GenerateKeyInfo {
+	Mechanism Mech = 1;
+	repeated Attribute Template = 2;
+}
+
+message GenerateKeyStatus {
+	bytes Key = 1;
+	bytes CheckSum = 2;
+}
+
+message GeneratePairInfo {
+	Mechanism Mech = 1;
+	repeated Attribute PubKeyTemplate = 2;
+	repeated Attribute PrivKeyTemplate = 3;
+}
+
+message GeneratePairStatus {
+	bytes PubKey = 1;
+	bytes PrivKey = 2;
+}
+
+message WrapKeyInfo {
+	bytes Key = 1;
+	bytes KeK = 2;
+	bytes MacKey = 3;
+	Mechanism PMech = 4;
+}
+message WrapKeyStatus {
+	bytes Wrapped = 1;
+}
+
+message UnwrapKeyInfo {
+	bytes Wrapped = 1;
+	bytes KeK = 2;
+	bytes MacKey = 3;
+	Mechanism UwMech = 4;
+	repeated Attribute Template = 5;
+}
+
+message UnwrapKeyStatus {
+	bytes Unwrapped = 1;
+	bytes CSum = 2;
+}
+
+message DeriveKeyInfo {
+	Mechanism PDeriveMech = 1;
+	repeated Attribute PTempl = 2;
+	bytes BaseKey = 3;
+	bytes Data = 4;
+}
+
+message DeriveKeyStatus {
+	bytes NewKey = 1;
+	bytes CSum = 2;
+}
+
+/******* Information ***********/
+message GetMechanismListInfo {
+	
+}
+
+message GetMechanismListStatus {
+	repeated uint64 Mechs = 1;
+}
+
+message GetMechanismInfoInfo {
+	uint64 Mech = 1;
+}
+
+message GetMechanismInfoStatus {
+	MechanismInfo MechInfo = 1;
+}
+
+message GetAttributeValueInfo {
+	bytes Object = 1;
+	repeated Attribute Attributes = 2;
+}
+
+message GetAttributeValueStatus {
+	repeated Attribute Attributes = 1;
+}
+
+message SetAttributeValueInfo {
+	bytes Object = 1;
+	repeated Attribute Attributes = 2;
+}
+
+message SetAttributeValueStatus {
+	bytes Object = 1;
+}
+
+/******* Deprecated ***********/
+// Original GREP11, just for ECC p256
+message GenerateInfo {
+	bytes oid = 1;
+}
+
+message GenerateStatus {
+	bytes privKey = 1;
+	bytes pubKey = 2;
+	string error = 3;
+}
+
+message SignInfo {
+	bytes privKey = 1;
+	bytes data = 2;
+}
+
+message SignStatus {
+	bytes sig = 1;
+	string error = 2;
+}
+
+message VerifyInfo {
+	bytes pubKey = 1;
+	bytes data = 2;
+	bytes sig = 3;
+}
