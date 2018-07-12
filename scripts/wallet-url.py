@@ -1,0 +1,48 @@
+#!/usr/bin/python3
+
+import sys
+import re
+import json as JSON
+from subprocess import check_output
+
+if len(sys.argv) == 3:
+    username = sys.argv[1]
+    walletname = sys.argv[2]
+    wallet = username + "-" + walletname + "-laravel"
+else:    
+    print(sys.argv[0] + " username walletname")
+    print(sys.argv[0] + " -h | --help")
+    sys.exit(0)
+
+cmd = "docker inspect --format='{{(index (index .NetworkSettings.Ports \"443/tcp\") 0).HostPort}}' " + wallet
+try:
+    port = check_output(cmd, shell=True).rstrip().decode('utf8')
+except:
+    print("wallet container not found " + sys.exc_info()[0])
+    sys.exit(-1)
+
+#print("port: " + port)
+
+cmd = "hostname -I"
+try:
+    address = check_output(cmd, shell=True).rstrip().decode('utf8').split()[0]
+except:
+    print("wallet address not found " + sys.exc_info()[0])
+    sys.exit(-1)
+
+pattern = "^172\."
+
+if re.search(pattern,address):
+    cmd = "curl -s http://169.254.169.254/latest/meta-data/public-ipv4"
+    try:
+        address = check_output(cmd, shell=True).rstrip().decode('utf8')
+    except:
+        print("wallet address not found " + sys.exc_info()[0])
+        sys.exit(-1)
+
+print("wallet container: " + wallet + " url: https://" + address + ":" + port + "/register")
+
+
+
+
+

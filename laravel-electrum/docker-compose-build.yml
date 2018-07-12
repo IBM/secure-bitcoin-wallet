@@ -1,0 +1,37 @@
+
+version: "3.4"
+services:
+
+  python-grpc:
+    image: python-grpc
+    build:
+      context: ../python-grpc
+      dockerfile: Dockerfile
+
+  electrum-daemon:
+    image: electrum-daemon
+    build:
+      context: ../electrum
+      dockerfile: Dockerfile
+      args:
+        - ELECTRUM_TAG=${ELECTRUM_TAG:-local-3.1.3-ep11}
+    depends_on:
+      - python-grpc
+    entrypoint: /bin/bash
+
+  laravel:
+    image: laravel
+    build:
+      context: ../laravel
+      dockerfile: Dockerfile
+
+  laravel-electrum:
+    image: laravel-electrum
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - LARAVEL_ELECTRUM_BRANCH=${LARAVEL_ELECTRUM_BRANCH:-local-c}
+    depends_on:
+      - laravel
+    entrypoint: /bin/bash
