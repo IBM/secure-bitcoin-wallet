@@ -14,11 +14,11 @@ It runs on [Laravel](https://laravel.com/), an emerging application framework wr
 These two componets are dockernized to run in a Docker container on x86 or in an isolated container on a 
 LinuexONE Secure Service Container (SSC).
 
-![A blockdiagram](https://github.com/moriohara/secure-bitcoin-wallet/blob/images/images/blockdiagram.png)*Block Diagram*
+![A blockdiagram](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/blockdiagram.png)*Block Diagram*
 
 Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
-![A screenshot](https://github.com/moriohara/secure-bitcoin-wallet/blob/images/images/secure-bitcoin-wallet-on-ibm-linuxone.png)*A Screenshot*
+![A screenshot](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/secure-bitcoin-wallet-on-ibm-linuxone.png)*A Screenshot*
 
 ## WARNING: This software is for demonstration purposes only. Use at your own risk.
 
@@ -35,7 +35,7 @@ $ docker build -t php:apache .
 Then, build an Elecrum wallet and its frontend by using docker-compose.
 
 ```
-$ git clone https://github.com/moriohara/secure-bitcoin-wallet.git
+$ git clone https://github.com/IBM/secure-bitcoin-wallet.git
 $ cd secure-bitcoin-wallet/laravel-electrum
 $ docker-compose -f docker-compose-build.yml build
 ```
@@ -91,7 +91,7 @@ $ docker run -d -e DISPLAY=${DISPLAY} -v ${HOME}/.Xauthority:/root/.Xauthority:r
 
 ## License
 
-[Apache 2.0](https://github.com/moriohara/secure-bitcoin-wallet/blob/release-1.0/LICENSE)
+[Apache 2.0](https://github.com/IBM/secure-bitcoin-wallet/blob/master/LICENSE)
 
 ## Contributor License Agreement (CLA)
 
