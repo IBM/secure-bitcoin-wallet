@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pushd ${HOME}/git/secure-bitcoin-wallet
+pushd ..
 
 ARCH=`uname -m`
 if [ $ARCH = "x86_64" ]; then
