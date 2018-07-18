@@ -10,8 +10,8 @@ a bitcoin wallet by interacting with the bitcoin network.
 It can encrypt/decrypt a wallet file using an [EP11 crypto server](https://www.ibm.com/support/knowledgecenter/en/linuxonibm/com.ibm.linux.z.lxce/lxce_stack.html) (zHSM) to protect the encryption key. 
 The [Electrum frontend](/laravel-electrum), a modified version of [Electrum for Laravel 5.4+](https://github.com/AraneaDev/laravel-electrum),
 runs as a Web frontend to interact with bitcoin users via a Web browser.
-It runs on [Laravel](https://laravel.com/), an emerging application framework written in PHP taking advatnage of NodeJS for client-side rendering.
-These two componets are dockernized to run in a Docker container on x86 or in an isolated container on a 
+It runs on [Laravel](https://laravel.com/), an emerging application framework written in PHP taking advantage of NodeJS for client-side rendering.
+These two components are dockernized to run in a Docker container on x86 or in an isolated container on a 
 LinuexONE Secure Service Container (SSC).
 
 ![A blockdiagram](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/blockdiagram.png)*Block Diagram*
@@ -58,13 +58,13 @@ $ docker run -d -v ${WALLET}-db:/data -p ${PORT}:443 -e ELECTRUM_DAEMON_HOST=${W
 
 Use a Web browser to access the electrum wallet.
 
-- Access https://hostname:port/electrum from a browser with the port number specified for the laravel-electrum container .
+- Access https://hostname:port/electrum from a browser with the port number specified for the laravel-electrum container.
 - Accept a warning on a browser to use a self-signed certificate.
 - Click "register" to register name, e-mail address, and password, for the first time. Or click "login" if already registered.
 - Access https://hostname:port/electrum again if not redirected automatically.
 - Create and load a wallet from a Wallet tab.
 - Reload the browser.
-- Select one of three tabs (History, Requests, Receive, Send, or Sign) to interact with the wallet.
+- Select one of three tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign) to interact with the wallet.
 
 ### Additional note
 
