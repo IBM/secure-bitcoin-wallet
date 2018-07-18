@@ -20,15 +20,17 @@ if [ $ARCH = "x86_64" ]; then
     docker run -d -v $USER-$wallet-db:/data -p 443 -e ELECTRUM_DAEMON_HOST=$USER-$wallet-wallet  --link $USER-$wallet-wallet:$USER-$wallet-wallet --name $USER-$wallet-laravel laravel-electrum
 else
 
-    ZHSM=${ZHSM:-localhost}
+    export ZHSM=${ZHSM:-localhost}
+    export DOCKER_HOST=tcp://$SSC_HOST:2376
+    export DOCKER_TLS_VERIFY=1 
 
-    ./docker-ssc pull $REGISTRY/$USER/laravel-electrum # pull an image on SSC  
-    ./docker-ssc pull $REGISTRY/$USER/electrum-daemon # pull an image on SSC
+    docker pull $REGISTRY/$USER/laravel-electrum # pull an image on SSC  
+    docker pull $REGISTRY/$USER/electrum-daemon # pull an image on SSC
 
     # runing electrum-daemon for $wallet
-    ./docker-ssc run -d -v $USER-$wallet:/data -e ZHSM=${ZHSM} --name $USER-$wallet-wallet $REGISTRY/$USER/electrum-daemon
+    docker run -d -v $USER-$wallet:/data -e ZHSM=${ZHSM} --name $USER-$wallet-wallet $REGISTRY/$USER/electrum-daemon
     # runing laravel-electrum for $wallet
-    ./docker-ssc run -d -v $USER-$wallet-db:/data -p 443 -e ELECTRUM_DAEMON_HOST=$USER-$wallet-wallet  --link $USER-$wallet-wallet:$USER-$wallet-wallet --name $USER-$wallet-laravel $REGISTRY/$USER/laravel-electrum
+    docker run -d -v $USER-$wallet-db:/data -p 443 -e ELECTRUM_DAEMON_HOST=$USER-$wallet-wallet  --link $USER-$wallet-wallet:$USER-$wallet-wallet --name $USER-$wallet-laravel $REGISTRY/$USER/laravel-electrum
 fi
 
 
