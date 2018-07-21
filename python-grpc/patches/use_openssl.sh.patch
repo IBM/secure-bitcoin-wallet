@@ -1,0 +1,13 @@
+--- tools/openssl/use_openssl.sh.orig	2018-07-21 04:10:18.195085969 +0000
++++ tools/openssl/use_openssl.sh	2018-07-21 04:11:31.930678565 +0000
+@@ -36,8 +36,8 @@ tar xfz openssl-1.0.2f.tar.gz
+ 
+ # build openssl
+ cd openssl-1.0.2f
+-CC="$CC -fPIC -fvisibility=hidden" ./config no-asm
+-make
++CC="$CC -fPIC -fvisibility=hidden" ./config no-asm --prefix=/usr --openssldir=/usr/local/ssl
++make install
+ 
+ # generate the 'grpc_obj' directory needed by the makefile
+ mkdir grpc_obj
