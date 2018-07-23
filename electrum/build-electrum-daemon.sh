@@ -10,7 +10,7 @@ fi
 ARCH=`uname -m`
 if [ $ARCH = "x86_64" ]; then
     ARCH="amd64"
-    docker build -t electrum-daemon .
+    docker build -t $USER/electrum-daemon .
 else
     docker pull $REGISTRY/python-grpc
     docker tag $REGISTRY/python-grpc python-grpc

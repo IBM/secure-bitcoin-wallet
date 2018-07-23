@@ -10,7 +10,7 @@ fi
 ARCH=`uname -m`
 if [ $ARCH = "x86_64" ]; then
     ARCH="amd64"
-    docker build -t laravel-electrum .
+    docker build -t $USER/laravel-electrum .
 else
     docker pull $REGISTRY/laravel
     docker tag $REGISTRY/laravel laravel

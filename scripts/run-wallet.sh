@@ -15,9 +15,9 @@ ARCH=`uname -m`
 if [ $ARCH = "x86_64" ]; then
     ARCH="amd64"
     # runing electrum-daemon for $wallet
-    docker run -d -v $USER-$wallet:/data --name $USER-$wallet-wallet electrum-daemon
+    docker run -d -v $USER-$wallet:/data --name $USER-$wallet-wallet $USER/electrum-daemon
     # runing laravel-electrum for $wallet
-    docker run -d -v $USER-$wallet-db:/data -p 443 -e ELECTRUM_DAEMON_HOST=$USER-$wallet-wallet  --link $USER-$wallet-wallet:$USER-$wallet-wallet --name $USER-$wallet-laravel laravel-electrum
+    docker run -d -v $USER-$wallet-db:/data -p 443 -e ELECTRUM_DAEMON_HOST=$USER-$wallet-wallet  --link $USER-$wallet-wallet:$USER-$wallet-wallet --name $USER-$wallet-laravel $USER/laravel-electrum
 else
 
     #export ZHSM=${ZHSM:-localhost}
