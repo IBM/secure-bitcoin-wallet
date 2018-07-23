@@ -5,7 +5,7 @@ if [ $# == 1 ] ; then
     echo "USER="$USER
 fi
 
-REGISTRY=${REGISTRY:-localhost:5000}
+#REGISTRY=${REGISTRY:-localhost:5000}
 
 ARCH=`uname -m`
 if [ $ARCH = "x86_64" ]; then
