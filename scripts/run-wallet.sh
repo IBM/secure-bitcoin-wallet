@@ -14,10 +14,16 @@ DOCKER_CONTENT_TRUST=${DOCKER_CONTENT_TRUST:-0}
 ARCH=`uname -m`
 if [ $ARCH = "x86_64" ]; then
     ARCH="amd64"
+    declare -A ports=( [charlie]=4431 [devil]=4432 [eddy]=4433 )
+    if [ ${ports[$wallet]+_} ]; then
+	portmap=${ports[$wallet]}:443
+    else
+	portmap=443
+    fi
     # runing electrum-daemon for $wallet
     docker run -d -v $USER-$wallet:/data --name $USER-$wallet-wallet $USER/electrum-daemon
     # runing laravel-electrum for $wallet
-    docker run -d -v $USER-$wallet-db:/data -p 443 -e ELECTRUM_DAEMON_HOST=$USER-$wallet-wallet  --link $USER-$wallet-wallet:$USER-$wallet-wallet --name $USER-$wallet-laravel $USER/laravel-electrum
+    docker run -d -v $USER-$wallet-db:/data -p ${portmap} -e ELECTRUM_DAEMON_HOST=$USER-$wallet-wallet  --link $USER-$wallet-wallet:$USER-$wallet-wallet --name $USER-$wallet-laravel $USER/laravel-electrum
 else
 
     #export ZHSM=${ZHSM:-localhost}
