@@ -18,7 +18,7 @@ else:
     sys.exit(0)
 
 if platform.machine() == 's390x':
-    env = "DOCKER_HOST=tcp://$SSC_HOST:2376 DOCKER_TLS_VERIFY=1 "
+    env = "DOCKER_HOST=tcp://$SSC_HOST:2376 DOCKER_TLS_VERIFY=1 DOCKER_CERT_PATH=/etc/docker/cert.d/$SSC_HOST"
 else:
     env = ""
 

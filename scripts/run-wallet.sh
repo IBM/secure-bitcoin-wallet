@@ -29,6 +29,7 @@ else
     #export ZHSM=${ZHSM:-localhost}
     export DOCKER_HOST=tcp://$SSC_HOST:2376
     export DOCKER_TLS_VERIFY=1 
+    export DOCKER_CERT_PATH=/etc/docker/cert.d/$SSC_HOST
 
     docker pull $REGISTRY/$USER/laravel-electrum # pull an image on SSC  
     docker pull $REGISTRY/$USER/electrum-daemon # pull an image on SSC
