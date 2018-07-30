@@ -8,7 +8,7 @@ return [
     'port'          => '7777',
     'web_interface' => [
         'enabled'    => true,
-        'currency'   => 'JPY',
+        'currency'   => 'AUD',
         'middleware' => ['web', 'auth'],
         'prefix'     => 'electrum',
     ],
