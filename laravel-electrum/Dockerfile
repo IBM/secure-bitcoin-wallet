@@ -2,6 +2,9 @@ FROM laravel
 
 ENV APP_ROOT /var/www/html/electrum
 
+RUN chown -R www-data /var/www
+USER www-data
+
 WORKDIR $APP_ROOT
 
 ADD composer.json .
@@ -60,5 +63,7 @@ ADD entrypoint.sh .
 VOLUME /data
 
 EXPOSE 443
+
+USER root
 
 CMD ["./entrypoint.sh"]
