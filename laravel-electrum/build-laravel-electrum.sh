@@ -7,6 +7,10 @@ fi
 
 #REGISTRY=${REGISTRY:-localhost:5000}
 
+DIR=${0%"build-laravel-electrum.sh"}
+echo "WORKDIR="$DIR
+pushd $DIR
+
 ARCH=`uname -m`
 if [ $ARCH = "x86_64" ]; then
     ARCH="amd64"
@@ -19,4 +23,4 @@ else
     docker push $REGISTRY/$USER/laravel-electrum
 fi
 
-
+popd
