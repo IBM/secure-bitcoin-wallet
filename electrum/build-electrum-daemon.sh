@@ -7,6 +7,10 @@ fi
 
 #REGISTRY=${REGISTRY:-localhost:5000}
 
+DIR=${0%"build-electrum-daemon.sh"}
+echo "WORKDIR="$DIR
+pushd $DIR
+
 ARCH=`uname -m`
 if [ $ARCH = "x86_64" ]; then
     ARCH="amd64"
@@ -19,3 +23,4 @@ else
     docker push $REGISTRY/$USER/electrum-daemon
 fi
 
+popd
