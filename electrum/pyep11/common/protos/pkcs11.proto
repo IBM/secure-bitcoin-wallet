@@ -15,15 +15,17 @@ limitations under the License.
 */
 syntax = "proto3";
 
-package grep11protos;
+package grep11;
 
-message LoadInfo {
-	bytes pin = 1;
-	bytes nonce = 2;
+import "gogo.proto";
+
+message Mechanism {
+	uint64 Mechanism = 1 [(gogoproto.casttype) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Mechanism"];
+	bytes Parameter = 2; //optional
 }
 
-message LoadStatus {
-	string address = 1;
-	bool session = 2;
-	string error = 3;
+message MechanismInfo {
+	uint64 MinKeySize = 1;
+	uint64 MaxKeySize = 2;
+	uint64 Flags = 3;
 }

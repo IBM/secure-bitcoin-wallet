@@ -1,0 +1,870 @@
+/*
+Copyright IBM Corp. 2018 All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+syntax = "proto3";
+
+package grep11;
+
+import "gogo.proto";
+import "annotations.proto";
+import "google/api/annotations.proto";
+import "pkcs11.proto";
+
+message GenerateRandomRequest {
+	uint64 Len = 1;
+}
+
+message GenerateRandomResponse {
+	bytes Rnd = 1 [(grep11.ep111) = {init : "in.Len"}];
+}
+
+message DigestInitRequest {
+	Mechanism Mech = 2;
+}
+
+message DigestInitResponse {
+	bytes State = 1 [(grep11.ep111) = {init : "ep11.MAX_DIGEST_STATE_BYTES"}];
+}
+
+message DigestRequest {
+	bytes State = 1;
+	bytes Data = 2;
+}
+
+message DigestResponse {
+	bytes Digest = 3 [(grep11.ep111) = {init : "ep11.MAX_DIGEST_BYTES"}];
+}
+
+message DigestUpdateRequest {
+	bytes State = 1;
+	bytes Data = 2;
+}
+
+message DigestUpdateResponse {
+	bytes State = 1 [(grep11.ep111) = {stream : "State"}];
+}
+
+message DigestKeyRequest {
+	bytes State = 1;
+	bytes Key = 2 [(grep11.ep111) = {rewrite: true}];
+}
+
+message DigestKeyResponse {
+	bytes State = 1 [(grep11.ep111) = {stream : "State"}];
+}
+
+message DigestFinalRequest {
+	bytes State = 1;
+}
+
+message DigestFinalResponse {
+	bytes Digest = 2 [(grep11.ep111) = {init : "ep11.MAX_DIGEST_BYTES"}];
+}
+
+message DigestSingleRequest {
+	Mechanism Mech = 1;
+	bytes Data = 2;
+}
+
+message DigestSingleResponse {
+	bytes Digest = 3 [(grep11.ep111) = {init : "ep11.MAX_DIGEST_BYTES"}];
+}
+
+message EncryptInitRequest {
+	Mechanism Mech = 2;
+	bytes Key = 3 [(grep11.ep111) = {rewrite: true}];
+}
+
+message EncryptInitResponse {
+	bytes State = 1 [(grep11.ep111) = {init : "ep11.MAX_CRYPT_STATE_BYTES"}];
+}
+
+message DecryptInitRequest {
+	Mechanism Mech = 2;
+	bytes Key = 3 [(grep11.ep111) = {rewrite: true}];
+}
+
+message DecryptInitResponse {
+	bytes State = 1 [(grep11.ep111) = {init : "ep11.MAX_CRYPT_STATE_BYTES"}];
+}
+
+message EncryptUpdateRequest {
+	bytes State = 1;
+	bytes Plain = 2;
+}
+
+message EncryptUpdateResponse {
+	bytes State = 1 [(grep11.ep111) = {stream : "State"}];
+	bytes Ciphered = 3 [(grep11.ep111) = {init : "len(in.Plain) + ep11.MAX_BLOCK_SIZE"}];
+}
+
+message DecryptUpdateRequest {
+	bytes State = 1;
+	bytes Ciphered = 2;
+}
+
+message DecryptUpdateResponse {
+	bytes State = 1 [(grep11.ep111) = {stream : "State"}];
+	bytes Plain = 3 [(grep11.ep111) = {init : "len(in.Ciphered) + ep11.MAX_BLOCK_SIZE"}];
+}
+
+message EncryptRequest {
+	bytes State = 1;
+	bytes Plain = 2;
+}
+
+message EncryptResponse {
+	bytes Ciphered = 3 [(grep11.ep111) = {init : "len(in.Plain) + ep11.MAX_BLOCK_SIZE"}];
+}
+
+message DecryptRequest {
+	bytes State = 1;
+	bytes Ciphered = 2;
+}
+
+message DecryptResponse {
+	bytes Plain = 3 [(grep11.ep111) = {init : "len(in.Ciphered) + ep11.MAX_BLOCK_SIZE"}];
+}
+
+message EncryptFinalRequest {
+	bytes State = 1;
+}
+
+message EncryptFinalResponse {
+	bytes Ciphered = 2 [(grep11.ep111) = {init : "ep11.MAX_BLOCK_SIZE"}];
+}
+
+message DecryptFinalRequest {
+	bytes State = 1;
+}
+
+message DecryptFinalResponse {
+	bytes Plain = 2 [(grep11.ep111) = {init : "ep11.MAX_BLOCK_SIZE"}];
+}
+
+message EncryptSingleRequest {
+	bytes Key = 1 [(grep11.ep111) = {rewrite: true}];
+	Mechanism Mech = 2;
+	bytes Plain = 3;
+}
+
+message EncryptSingleResponse {
+	bytes Ciphered = 4 [(grep11.ep111) = {init : "len(in.Plain) + ep11.MAX_BLOCK_SIZE"}];
+}
+
+message DecryptSingleRequest {
+	bytes Key = 1 [(grep11.ep111) = {rewrite: true}];
+	Mechanism Mech = 2;
+	bytes Ciphered = 3;
+}
+
+message DecryptSingleResponse {
+	bytes Plain = 4 [(grep11.ep111) = {init : "len(in.Ciphered) + ep11.MAX_BLOCK_SIZE"}];
+}
+
+message SignInitRequest {
+	Mechanism Mech = 2;
+	bytes PrivKey = 3 [(grep11.ep111) = {rewrite: true}];
+}
+
+message SignInitResponse {
+	bytes State = 1 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message VerifyInitRequest {
+	Mechanism Mech = 2;
+	bytes PubKey = 3 [(grep11.ep111) = {rewrite: true}];
+}
+
+message VerifyInitResponse {
+	bytes State = 1 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message SignUpdateRequest {
+	bytes State = 1;
+	bytes Data = 2;
+}
+
+message SignUpdateResponse {
+	bytes State = 1 [(grep11.ep111) = {stream : "State"}];
+}
+
+message VerifyUpdateRequest {
+	bytes State = 1;
+	bytes Data = 2;
+}
+
+message VerifyUpdateResponse {
+	bytes State = 1 [(grep11.ep111) = {stream : "State"}];
+}
+
+message SignFinalRequest {
+	bytes State = 1;
+}
+
+message SignFinalResponse {
+	bytes Signature = 2 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message VerifyFinalRequest {
+	bytes State = 1;
+	bytes Signature = 2;
+}
+
+message VerifyFinalResponse {
+}
+
+message SignRequest {
+	bytes State = 1;
+	bytes Data = 2;
+}
+
+message SignResponse {
+	bytes Signature = 3 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message VerifyRequest {
+	bytes State = 1;
+	bytes Data = 2;
+	bytes Signature = 3;
+}
+
+message VerifyResponse {
+}
+
+message SignSingleRequest {
+	bytes PrivKey = 1 [(grep11.ep111) = {rewrite: true}];
+	Mechanism Mech = 2;
+	bytes Data = 3;
+}
+
+message SignSingleResponse {
+	bytes Signature = 4 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message VerifySingleRequest {
+	bytes PubKey = 1 [(grep11.ep111) = {rewrite: true}];
+	Mechanism Mech = 2;
+	bytes Data = 3;
+	bytes Signature = 4;
+}
+
+message VerifySingleResponse {
+}
+
+message GenerateKeyRequest {
+	Mechanism Mech = 1;
+	map<uint64,bytes> Template = 2 [(gogoproto.castkey) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Attribute"];
+}
+
+message GenerateKeyResponse {
+	bytes Key = 4 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE", rewrite: true}];
+	bytes CheckSum = 5 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message GenerateKeyPairRequest {
+	Mechanism Mech = 1;
+	map<uint64,bytes> PubKeyTemplate = 2 [(gogoproto.castkey) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Attribute"];
+	map<uint64,bytes> PrivKeyTemplate = 3 [(gogoproto.castkey) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Attribute"];
+}
+
+message GenerateKeyPairResponse {
+	bytes PrivKey = 5 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE", create: "in.PrivKeyTemplate"}];
+	bytes PubKey = 6 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE", create: "in.PubKeyTemplate"}];
+}
+
+message WrapKeyRequest {
+	bytes Key = 1 [(grep11.ep111) = {rewrite: true}];
+	bytes KeK = 2 [(grep11.ep111) = {rewrite: true}];
+	bytes MacKey = 3 [(grep11.ep111) = {rewrite: true, allownil: true}];
+	Mechanism Mech = 4;
+}
+
+message WrapKeyResponse {
+	bytes Wrapped = 5 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message UnwrapKeyRequest {
+	bytes Wrapped = 1;
+	bytes KeK = 2 [(grep11.ep111) = {rewrite: true}];
+	bytes MacKey = 3 [(grep11.ep111) = {rewrite: true, allownil: true}];
+	Mechanism Mech = 5;
+	map<uint64,bytes> Template = 6 [(gogoproto.castkey) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Attribute"];
+}
+
+message UnwrapKeyResponse {
+	bytes Unwrapped = 7 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE", rewrite: true}];
+	bytes CheckSum = 8 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message DeriveKeyRequest {
+	Mechanism Mech = 1;
+	map<uint64,bytes> Template = 2 [(gogoproto.castkey) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Attribute"];
+	bytes BaseKey = 3 [(grep11.ep111) = {rewrite: true}];
+	bytes Data = 4 [(grep11.ep111) = {allownil: true}];
+}
+
+message DeriveKeyResponse {
+	bytes NewKey = 6 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE", rewrite: true}];
+	bytes CheckSum = 7 [(grep11.ep111) = {init : "ep11.MAX_BLOB_SIZE"}];
+}
+
+message GetMechanismListRequest {
+}
+
+message GetMechanismListResponse {
+	repeated uint64 Mechs = 2 [(gogoproto.casttype) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Mechanism", (grep11.ep111) = {init : "ep11.MAX_MECHANISM_COUNT"}];
+}
+
+message GetMechanismInfoRequest {
+	uint64 Mech = 1 [(gogoproto.casttype) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Mechanism"];
+}
+
+message GetMechanismInfoResponse {
+	MechanismInfo MechInfo = 3;
+}
+
+message GetAttributeValueRequest {
+	bytes Object = 1;
+	map<uint64,bytes> Attributes = 2 [(gogoproto.castkey) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Attribute"];
+}
+
+message GetAttributeValueResponse {
+	map<uint64,bytes> Attributes = 2 [(gogoproto.castkey) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Attribute", (grep11.ep111) = {stream : "Attributes"}];
+}
+
+message SetAttributeValueRequest {
+	bytes Object = 1;
+	map<uint64,bytes> Attributes = 2 [(gogoproto.castkey) = "github.ibm.com/IBM-Blockchain/grep11/generated/ep11.Attribute"];
+}
+
+message SetAttributeValueResponse {
+	bytes Object = 1 [(grep11.ep111) = {stream : "Object"}];
+}
+
+service Crypto {
+// See https://www-03.ibm.com/security/cryptocards/pciecc/pdf/ep11-structure.pdf for
+// further documentation
+	// CK_RV m_GenerateRandom (
+	//     CK_BYTE_PTR rnd, CK_ULONG rndlen, 
+	//     target_t target) ;
+	rpc GenerateRandom(GenerateRandomRequest) returns (GenerateRandomResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/GenerateRandom"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_GenerateRandom(rndC, rndLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DigestInit (
+	//     unsigned char *state, size_t *statelen, 
+	//     const CK_MECHANISM_PTR mech, 
+	//     target_t target) ;
+	rpc DigestInit(DigestInitRequest) returns (DigestInitResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DigestInit"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DigestInit(stateC, &stateLenC, mechC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_Digest (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     CK_BYTE_PTR digest, CK_ULONG_PTR digestlen, 
+	//     target_t target) ;
+	rpc Digest(DigestRequest) returns (DigestResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/Digest"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_Digest(stateC, stateLenC, dataC, dataLenC, digestC, &digestLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DigestUpdate (
+	//     unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     target_t target) ;
+	rpc DigestUpdate(DigestUpdateRequest) returns (DigestUpdateResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DigestUpdate"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DigestUpdate(stateC, stateLenC, dataC, dataLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DigestKey (
+	//     unsigned char *state, size_t statelen, 
+	//     const unsigned char *key, size_t keylen, 
+	//     target_t target) ;
+	rpc DigestKey(DigestKeyRequest) returns (DigestKeyResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DigestKey"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DigestKey(stateC, stateLenC, keyC, keyLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DigestFinal (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR digest, CK_ULONG_PTR digestlen, 
+	//     target_t target) ;
+	rpc DigestFinal(DigestFinalRequest) returns (DigestFinalResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DigestFinal"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DigestFinal(stateC, stateLenC, digestC, &digestLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DigestSingle (
+	//     CK_MECHANISM_PTR mech, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     CK_BYTE_PTR digest, CK_ULONG_PTR digestlen, 
+	//     target_t target) ;
+	rpc DigestSingle(DigestSingleRequest) returns (DigestSingleResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DigestSingle"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DigestSingle(mechC, dataC, dataLenC, digestC, &digestLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_EncryptInit (
+	//     unsigned char *state, size_t *statelen, 
+	//     CK_MECHANISM_PTR mech, 
+	//     const unsigned char *key, size_t keylen, 
+	//     target_t target) ;
+	rpc EncryptInit(EncryptInitRequest) returns (EncryptInitResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/EncryptInit"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_EncryptInit(stateC, &stateLenC, mechC, keyC, keyLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DecryptInit (
+	//     unsigned char *state, size_t *statelen, 
+	//     CK_MECHANISM_PTR mech, 
+	//     const unsigned char *key, size_t keylen, 
+	//     target_t target) ;
+	rpc DecryptInit(DecryptInitRequest) returns (DecryptInitResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DecryptInit"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DecryptInit(stateC, &stateLenC, mechC, keyC, keyLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_EncryptUpdate (
+	//     unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR plain, CK_ULONG plainlen, 
+	//     CK_BYTE_PTR ciphered, CK_ULONG_PTR cipheredlen, 
+	//     target_t target) ;
+	rpc EncryptUpdate(EncryptUpdateRequest) returns (EncryptUpdateResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/EncryptUpdate"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_EncryptUpdate(stateC, stateLenC, plainC, plainLenC, cipheredC, &cipheredLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DecryptUpdate (
+	//     unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR ciphered, CK_ULONG cipheredlen, 
+	//     CK_BYTE_PTR plain, CK_ULONG_PTR plainlen, 
+	//     target_t target) ;
+	rpc DecryptUpdate(DecryptUpdateRequest) returns (DecryptUpdateResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DecryptUpdate"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DecryptUpdate(stateC, stateLenC, cipheredC, cipheredLenC, plainC, &plainLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_Encrypt (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR plain, CK_ULONG plainlen, 
+	//     CK_BYTE_PTR ciphered, CK_ULONG_PTR cipheredlen, 
+	//     target_t target) ;
+	rpc Encrypt(EncryptRequest) returns (EncryptResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/Encrypt"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_Encrypt(stateC, stateLenC, plainC, plainLenC, cipheredC, &cipheredLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_Decrypt (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR ciphered, CK_ULONG cipheredlen, 
+	//     CK_BYTE_PTR plain, CK_ULONG_PTR plainlen, 
+	//     target_t target) ;
+	rpc Decrypt(DecryptRequest) returns (DecryptResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/Decrypt"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_Decrypt(stateC, stateLenC, cipheredC, cipheredLenC, plainC, &plainLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_EncryptFinal (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR ciphered, CK_ULONG_PTR cipheredlen, 
+	//     target_t target) ;
+	rpc EncryptFinal(EncryptFinalRequest) returns (EncryptFinalResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/EncryptFinal"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_EncryptFinal(stateC, stateLenC, cipheredC, &cipheredLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DecryptFinal (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR plain, CK_ULONG_PTR plainlen, 
+	//     target_t target) ;
+	rpc DecryptFinal(DecryptFinalRequest) returns (DecryptFinalResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DecryptFinal"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DecryptFinal(stateC, stateLenC, plainC, &plainLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_EncryptSingle (
+	//     const unsigned char *key, size_t keylen, 
+	//     CK_MECHANISM_PTR mech, 
+	//     CK_BYTE_PTR plain, CK_ULONG plainlen, 
+	//     CK_BYTE_PTR ciphered, CK_ULONG_PTR cipheredlen, 
+	//     target_t target) ;
+	rpc EncryptSingle(EncryptSingleRequest) returns (EncryptSingleResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/EncryptSingle"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_EncryptSingle(keyC, keyLenC, mechC, plainC, plainLenC, cipheredC, &cipheredLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DecryptSingle (
+	//     const unsigned char *key, size_t keylen, 
+	//     CK_MECHANISM_PTR mech, 
+	//     CK_BYTE_PTR ciphered, CK_ULONG cipheredlen, 
+	//     CK_BYTE_PTR plain, CK_ULONG_PTR plainlen, 
+	//     target_t target) ;
+	rpc DecryptSingle(DecryptSingleRequest) returns (DecryptSingleResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DecryptSingle"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DecryptSingle(keyC, keyLenC, mechC, cipheredC, cipheredLenC, plainC, &plainLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_SignInit (
+	//     unsigned char *state, size_t *statelen, 
+	//     CK_MECHANISM_PTR mech, 
+	//     const unsigned char *privKey, size_t privKeylen, 
+	//     target_t target) ;
+	rpc SignInit(SignInitRequest) returns (SignInitResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/SignInit"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_SignInit(stateC, &stateLenC, mechC, privKeyC, privKeyLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_VerifyInit (
+	//     unsigned char *state, size_t *statelen, 
+	//     CK_MECHANISM_PTR mech, 
+	//     const unsigned char *pubKey, size_t pubKeylen, 
+	//     target_t target) ;
+	rpc VerifyInit(VerifyInitRequest) returns (VerifyInitResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/VerifyInit"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_VerifyInit(stateC, &stateLenC, mechC, pubKeyC, pubKeyLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_SignUpdate (
+	//     unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     target_t target) ;
+	rpc SignUpdate(SignUpdateRequest) returns (SignUpdateResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/SignUpdate"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_SignUpdate(stateC, stateLenC, dataC, dataLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_VerifyUpdate (
+	//     unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     target_t target) ;
+	rpc VerifyUpdate(VerifyUpdateRequest) returns (VerifyUpdateResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/VerifyUpdate"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_VerifyUpdate(stateC, stateLenC, dataC, dataLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_SignFinal (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR signature, CK_ULONG_PTR signaturelen, 
+	//     target_t target) ;
+	rpc SignFinal(SignFinalRequest) returns (SignFinalResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/SignFinal"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_SignFinal(stateC, stateLenC, signatureC, &signatureLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_VerifyFinal (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR signature, CK_ULONG signaturelen, 
+	//     target_t target) ;
+	rpc VerifyFinal(VerifyFinalRequest) returns (VerifyFinalResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/VerifyFinal"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_VerifyFinal(stateC, stateLenC, signatureC, signatureLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_Sign (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     CK_BYTE_PTR signature, CK_ULONG_PTR signaturelen, 
+	//     target_t target) ;
+	rpc Sign(SignRequest) returns (SignResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/Sign"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_Sign(stateC, stateLenC, dataC, dataLenC, signatureC, &signatureLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_Verify (
+	//     const unsigned char *state, size_t statelen, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     CK_BYTE_PTR signature, CK_ULONG signaturelen, 
+	//     target_t target) ;
+	rpc Verify(VerifyRequest) returns (VerifyResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/Verify"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_Verify(stateC, stateLenC, dataC, dataLenC, signatureC, signatureLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_SignSingle (
+	//     const unsigned char *privKey, size_t privKeylen, 
+	//     CK_MECHANISM_PTR mech, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     CK_BYTE_PTR signature, CK_ULONG_PTR signaturelen, 
+	//     target_t target) ;
+	rpc SignSingle(SignSingleRequest) returns (SignSingleResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/SignSingle"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_SignSingle(privKeyC, privKeyLenC, mechC, dataC, dataLenC, signatureC, &signatureLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_VerifySingle (
+	//     const unsigned char *pubKey, size_t pubKeylen, 
+	//     CK_MECHANISM_PTR mech, 
+	//     CK_BYTE_PTR data, CK_ULONG datalen, 
+	//     CK_BYTE_PTR signature, CK_ULONG signaturelen, 
+	//     target_t target) ;
+	rpc VerifySingle(VerifySingleRequest) returns (VerifySingleResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/VerifySingle"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_VerifySingle(pubKeyC, pubKeyLenC, mechC, dataC, dataLenC, signatureC, signatureLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_GenerateKey (
+	//     CK_MECHANISM_PTR mech, 
+	//     CK_ATTRIBUTE_PTR template, CK_ULONG templatelen, 
+	//     const unsigned char *pin, size_t pinlen, 
+	//     unsigned char *key, size_t *keylen, 
+	//     unsigned char *checkSum, size_t *checkSumlen, 
+	//     target_t target) ;
+	rpc GenerateKey(GenerateKeyRequest) returns (GenerateKeyResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/GenerateKey"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_GenerateKey(mechC, templateC, templateLenC, s.pinblobC, s.pinbloblen, keyC, &keyLenC, checkSumC, &checkSumLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_GenerateKeyPair (
+	//     CK_MECHANISM_PTR mech, 
+	//     CK_ATTRIBUTE_PTR pubKeyTemplate, CK_ULONG pubKeyTemplatelen, 
+	//     CK_ATTRIBUTE_PTR privKeyTemplate, CK_ULONG privKeyTemplatelen, 
+	//     const unsigned char *pin, size_t pinlen, 
+	//     unsigned char *privKey, size_t *privKeylen, 
+	//     unsigned char *pubKey, size_t *pubKeylen, 
+	//     target_t target) ;
+	rpc GenerateKeyPair(GenerateKeyPairRequest) returns (GenerateKeyPairResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/GenerateKeyPair"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_GenerateKeyPair(mechC, pubKeyTemplateC, pubKeyTemplateLenC, privKeyTemplateC, privKeyTemplateLenC, s.pinblobC, s.pinbloblen, privKeyC, &privKeyLenC, pubKeyC, &pubKeyLenC, s.targetC)"
+	      postcall: "rc.PrivKey, rc.PubKey, err = s.Rewriter.FixupPair(c, in.Mech.Mechanism, in.PrivKeyTemplate, rc.PrivKey, in.PubKeyTemplate, rc.PubKey)"
+	    };
+	}
+
+	// CK_RV m_WrapKey (
+	//     const unsigned char *key, size_t keylen, 
+	//     const unsigned char *keK, size_t keKlen, 
+	//     const unsigned char *macKey, size_t macKeylen, 
+	//     const CK_MECHANISM_PTR mech, 
+	//     CK_BYTE_PTR wrapped, CK_ULONG_PTR wrappedlen, 
+	//     target_t target) ;
+	rpc WrapKey(WrapKeyRequest) returns (WrapKeyResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/WrapKey"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_WrapKey(keyC, keyLenC, keKC, keKLenC, macKeyC, macKeyLenC, mechC, wrappedC, &wrappedLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_UnwrapKey (
+	//     const CK_BYTE_PTR wrapped, CK_ULONG wrappedlen, 
+	//     const unsigned char *keK, size_t keKlen, 
+	//     const unsigned char *macKey, size_t macKeylen, 
+	//     const unsigned char *pin, size_t pinlen, 
+	//     const CK_MECHANISM_PTR mech, 
+	//     const CK_ATTRIBUTE_PTR template, CK_ULONG templatelen, 
+	//     unsigned char *unwrapped, size_t *unwrappedlen, 
+	//     CK_BYTE_PTR checkSum, CK_ULONG *checkSumlen, 
+	//     target_t target) ;
+	rpc UnwrapKey(UnwrapKeyRequest) returns (UnwrapKeyResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/UnwrapKey"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_UnwrapKey(wrappedC, wrappedLenC, keKC, keKLenC, macKeyC, macKeyLenC, s.pinblobC, s.pinbloblen, mechC, templateC, templateLenC, unwrappedC, &unwrappedLenC, checkSumC, &checkSumLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_DeriveKey (
+	//     CK_MECHANISM_PTR mech, 
+	//     CK_ATTRIBUTE_PTR template, CK_ULONG templatelen, 
+	//     const unsigned char *baseKey, size_t baseKeylen, 
+	//     const unsigned char *data, size_t datalen, 
+	//     const unsigned char *pin, size_t pinlen, 
+	//     unsigned char *newKey, size_t *newKeylen, 
+	//     unsigned char *checkSum, size_t *checkSumlen, 
+	//     target_t target) ;
+	rpc DeriveKey(DeriveKeyRequest) returns (DeriveKeyResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/DeriveKey"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_DeriveKey(mechC, templateC, templateLenC, baseKeyC, baseKeyLenC, dataC, dataLenC, s.pinblobC, s.pinbloblen, newKeyC, &newKeyLenC, checkSumC, &checkSumLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_GetMechanismList (
+	//     CK_SLOT_ID slot, 
+	//     CK_MECHANISM_TYPE_PTR mechs, CK_ULONG_PTR mechslen, 
+	//     target_t target) ;
+	rpc GetMechanismList(GetMechanismListRequest) returns (GetMechanismListResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/GetMechanismList"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_GetMechanismList(C.CK_SLOT_ID(0), mechsC, &mechsLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_GetMechanismInfo (
+	//     CK_SLOT_ID slot, 
+	//     CK_MECHANISM_TYPE mech, 
+	//     CK_MECHANISM_INFO_PTR mechInfo, 
+	//     target_t target) ;
+	rpc GetMechanismInfo(GetMechanismInfoRequest) returns (GetMechanismInfoResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/GetMechanismInfo"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_GetMechanismInfo(C.CK_SLOT_ID(0), mechC, mechInfoC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_GetAttributeValue (
+	//     const unsigned char *object, size_t objectlen, 
+	//     CK_ATTRIBUTE_PTR attributes, CK_ULONG attributeslen, 
+	//     target_t target) ;
+	rpc GetAttributeValue(GetAttributeValueRequest) returns (GetAttributeValueResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/GetAttributeValue"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_GetAttributeValue(objectC, objectLenC, attributesC, attributesLenC, s.targetC)"
+	    };
+	}
+
+	// CK_RV m_SetAttributeValue (
+	//     unsigned char *object, size_t objectlen, 
+	//     CK_ATTRIBUTE_PTR attributes, CK_ULONG attributeslen, 
+	//     target_t target) ;
+	rpc SetAttributeValue(SetAttributeValueRequest) returns (SetAttributeValueResponse) {
+	    option (google.api.http) = {
+	      post: "/v1/crypto/SetAttributeValue"
+	    };
+	    option (grep11.ep11) = {
+	      call: "m_SetAttributeValue(objectC, objectLenC, attributesC, attributesLenC, s.targetC)"
+	    };
+	}
+
+}

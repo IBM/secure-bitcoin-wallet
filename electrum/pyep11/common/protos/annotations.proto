@@ -1,0 +1,50 @@
+/*
+Copyright IBM Corp. 2016 All Rights Reserved.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+		 http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+syntax = "proto3";
+
+package grep11;
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.MethodOptions {
+	EP11MethodOption ep11 = 11001;
+	PKCS11MethodOption pkcs11 = 11002;
+}
+
+extend google.protobuf.FieldOptions {
+	EP11FieldOption ep111 = 11011;
+	PKCS11FieldOption pkcs111 = 11012;
+}
+
+message EP11MethodOption {
+	string call = 1;
+	string postcall = 2;
+}
+
+message PKCS11MethodOption {
+
+}
+
+message EP11FieldOption {
+	string init = 1;   // For output byte arrays, specify the array initialization length
+	string stream = 2; // For arrays that get updated (i.e. streamed) like DigestUpdate.state
+	string create = 3; // For keyblobs
+	bool rewrite = 4;  // For keyblobs
+	bool allownil = 5; // For byte array parameters that are allowed be nil, so no nil-check required
+}
+
+message PKCS11FieldOption {
+
+}
