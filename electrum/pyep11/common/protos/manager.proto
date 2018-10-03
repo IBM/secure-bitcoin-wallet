@@ -15,51 +15,15 @@ limitations under the License.
 */
 syntax = "proto3";
 
-package grep11protos;
+package grep11;
 
-import "pkcs11.proto";
-
-message SearchInfo {
-	repeated Attribute Template = 1;
+message LoadInfo {
+	bytes pin = 1;
+	bytes nonce = 2;
 }
 
-message ObjectList {
-	repeated bytes Objects = 1;
-}
-
-message DeleteStatus {
-	
-}
-
-message StoreStatus {
-
-}
-
-message LoginInfo {
-	string Name = 1;
-	string Password = 2;
-}
-
-message AuthStatus {
-	bytes Token = 1;
-}
-
-message LogOutInfo {
-
-}
-
-message LogOutStatus {
-
-}
-
-message ChangeStatus {
-
-}
-
-message ServerInfoInfo {
-
-}
-
-message InfoStatus {
-
+message LoadStatus {
+	string address = 1;
+	bool session = 2;
+	string error = 3;
 }
