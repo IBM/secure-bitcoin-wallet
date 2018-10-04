@@ -25,8 +25,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends protobuf-compil
     pip3 install grpclib && \
     cd /git/pyep11 && \
     python3 -m grpc_tools.protoc common/protos/*.proto generated/protos/*.proto \
-        vendor/github.com/gogo/protobuf/gogoproto/*.proto vendor/github.com/gogo/googleapis/google/api/*.proto \
-        -Icommon/protos -Igenerated/protos -Ivendor/github.com/gogo/protobuf/gogoproto \
+        vendor/github.com/gogo/protobuf/gogoproto/*.proto \
+        vendor/github.com/gogo/googleapis/google/api/*.proto \
+        -Icommon/protos -Igenerated/protos \
+	-Ivendor/github.com/gogo/protobuf/gogoproto \
 	-Ivendor/github.com/gogo/googleapis \
         --python_out=generated/python_grpc --grpc_python_out=generated/python_grpc && \
     mv /git/pyep11/ep11.py /git/pyep11/pyep11.py /git/pyep11/generated/python_grpc/* /git/electrum && \
