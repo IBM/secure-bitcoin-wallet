@@ -15,5 +15,9 @@ limitations under the License.
 */
 syntax = "proto3";
 
-package grep11protos;
+package grep11;
 
+message GetServerListRequest{}
+message GetServerListResponse{
+	repeated string Address = 1;
+}
