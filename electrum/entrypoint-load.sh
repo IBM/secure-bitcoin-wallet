@@ -39,6 +39,6 @@ else
 fi
 
 # wait here in a daemon mode
-while true; do
-  tail -f /dev/null & wait ${!}
-done
+#while true; do
+#  tail -f /dev/null & wait ${!}
+#done

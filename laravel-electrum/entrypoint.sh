@@ -1,10 +1,11 @@
 #!/bin/bash
 
+DB_VOLUME="/data"
 rm $APP_ROOT/database/development.sqlite3
-touch /data/development.sqlite3
-ln -s /data/development.sqlite3 $APP_ROOT/database
-chmod 777 /data/development.sqlite3
-chmod 777 /data
+touch $DB_VOLUME/development.sqlite3
+ln -s $DB_VOLUME/development.sqlite3 $APP_ROOT/database
+chmod 777 $DB_VOLUME/development.sqlite3
+chmod 777 $DB_VOLUME
 
 sed "s/$electrumhost = 'electrum-daemon';/$electrumhost = '$ELECTRUM_DAEMON_HOST';/" <  $APP_ROOT/vendor/araneadev/laravel-electrum/src/config/electrum.php > $APP_ROOT/vendor/araneadev/laravel-electrum/src/config/electrum.php.new
 diff $APP_ROOT/vendor/araneadev/laravel-electrum/src/config/electrum.php $APP_ROOT/vendor/araneadev/laravel-electrum/src/config/electrum.php.new
