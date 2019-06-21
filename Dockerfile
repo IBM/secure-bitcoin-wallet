@@ -48,7 +48,8 @@ RUN apt-get update && \
 ###################################################################################
 # FROM electrum/Dockerfile
 
-ARG ELECTRUM_TAG="local-3.1.3-ep11"
+ARG ELECTRUM_TAG="local-3.3.6-ep11"
+#ARG ELECTRUM_TAG="local-3.1.3-ep11"
 #ARG ELECTRUM_TAG="master"
 
 ENV NETWORK "--testnet"
@@ -69,8 +70,9 @@ RUN apt-get install -y --no-install-recommends protobuf-compiler pyqt5-dev-tools
     cd /git/electrum && \
     git checkout ${ELECTRUM_TAG} && \
     pip3 install . && \
-    pyrcc5 icons.qrc -o gui/qt/icons_rc.py && \
-    protoc --proto_path=lib/ --python_out=lib/ lib/paymentrequest.proto && \
+#   pyrcc5 icons.qrc -o gui/qt/icons_rc.py && \
+#   protoc --proto_path=lib/ --python_out=lib/ lib/paymentrequest.proto && \
+    protoc --proto_path=electrum --python_out=electrum electrum/paymentrequest.proto && \
 #    pip3 install grpclib && \
 #    cd /git/pyep11 && \
 #    python3 -m grpc_tools.protoc common/protos/*.proto generated/protos/*.proto \

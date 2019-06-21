@@ -15,26 +15,26 @@ echo "ZHSM=${ZHSM}"
 
 # Run electrum in a GUI mode when specified
 if [ "${ELECTRUM_MODE}" = "GUI" ]; then
-    python3 electrum ${VERBOSE} ${NETWORK} gui
+    ./run_electrum ${VERBOSE} ${NETWORK} gui
 else
-    python3 electrum ${NETWORK} setconfig rpcuser ${ELECTRUM_USER}
-    python3 electrum ${NETWORK} setconfig rpcpassword ${ELECTRUM_PASSWORD}
-    python3 electrum ${NETWORK} setconfig rpchost 0.0.0.0
-    python3 electrum ${NETWORK} setconfig rpcport 7777
+    ./run_electrum ${NETWORK} setconfig rpcuser ${ELECTRUM_USER}
+    ./run_electrum ${NETWORK} setconfig rpcpassword ${ELECTRUM_PASSWORD}
+    ./run_electrum ${NETWORK} setconfig rpchost 0.0.0.0
+    ./run_electrum ${NETWORK} setconfig rpcport 7777
 
-    python3 electrum daemon ${VERBOSE} ${NETWORK} start
+    ./run_electrum daemon ${VERBOSE} ${NETWORK} start
 
     if [ -z "${WALLET}" ]; then
-	python3 electrum daemon ${VERBOSE} ${NETWORK} status
+	./run_electrum daemon ${VERBOSE} ${NETWORK} status
     else
 	echo ${PASSWORD} > /tmp/pass
 	if [ -z "${MULTISIG}" ]; then
-	    python3 electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} load_wallet < /tmp/pass 1> /tmp/load-wallet.log 2> /tmp/load-wallet.err
+	    ./run_electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} load_wallet < /tmp/pass 1> /tmp/load-wallet.log 2> /tmp/load-wallet.err
 	else
-	    python3 electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} load_multisig_wallet < /tmp/pass 1> /tmp/load-multisig-wallet.log 2> /tmp/load-multisig-wallet.err
+	    ./run_electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} load_multisig_wallet < /tmp/pass 1> /tmp/load-multisig-wallet.log 2> /tmp/load-multisig-wallet.err
 	fi
 	rm /tmp/pass
-	python3 electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} status
+	./run_electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} status
     fi
 fi
 

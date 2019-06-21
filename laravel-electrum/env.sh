@@ -4,7 +4,7 @@ APP_KEY=`grep APP_KEY=base64 .env | sed s/APP_KEY=//`
 
 echo $APP_KEY
 
-sed "s|'APP_KEY'|'APP_KEY','$APP_KEY'|" < config/app.php | sed "s|'UTC'|'AEST'|" > config/app.php.new
+sed "s|'APP_KEY'|'APP_KEY','$APP_KEY'|" < config/app.php | sed "s|'UTC'|'UTC'|" > config/app.php.new
 diff config/app.php config/app.php.new
 mv config/app.php.new config/app.php
 
