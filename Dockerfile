@@ -1,16 +1,71 @@
 
 
-FROM ubuntu:18.04
+#FROM ubuntu:18.04
+
+FROM node:10.16.0-stretch-slim AS node
+
+FROM python:3.7-slim-stretch
+
+COPY --from=node /usr/local /usr/local
+
+WORKDIR /git
+ENV GRPC_PYTHON_BUILD_SYSTEM_OPENSSL 1
+
+RUN apt-get update \
+	&& mkdir /data \
+# installing Docker based on https://docs.docker.com/install/linux/docker-ce/ubuntu
+#       && apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+        && apt-get -y install ca-certificates curl \
+# install python and other additional packages
+        && apt-get install -y --no-install-recommends git python3-pip python3-dev build-essential python3-setuptools python3-wheel protobuf-compiler libssl-dev libffi-dev autoconf automake libtool vim \
+# building the grpc c core library from source
+        && git clone -b v1.20.x https://github.com/grpc/grpc.git \
+        && cd /git/grpc \
+        && git submodule update --init \
+        && make install \
+# installing Cython to build packages for python
+        && pip3 install Cython \
+# installing grpcio package for python
+        && cd /git/grpc \
+        && pip3 install -rrequirements.txt \
+        && GRPC_PYTHON_BUILD_WITH_CYTHON=1 pip3 install . \
+# installing grpcio-tools package for python
+        && cd /git/grpc/tools/distrib/python/grpcio_tools \
+        && python3 ../make_grpcio_tools.py \
+        && GRPC_PYTHON_BUILD_WITH_CYTHON=1 pip3 install . \
+# clean up
+        && apt-get -y autoremove && apt-get clean \
+        && rm -rf /git/grpc
+#       && rm -rf /var/lib/apt/lists/* /var/tmp/* /git/grpc
+
+#RUN pip3 install wheel uwsgi flask cryptography pyopenssl pyyaml ibm-cos-sdk asn1
+
+#WORKDIR /git/pyep11
+#COPY pyep11 .
+
+#RUN python3 -m grpc_tools.protoc common/protos/*.proto generated/protos/*.proto \
+#        vendor/github.com/gogo/protobuf/gogoproto/*.proto \
+#        vendor/github.com/gogo/googleapis/google/api/*.proto \
+#        -Icommon/protos -Igenerated/protos \
+#	-Ivendor/github.com/gogo/protobuf/gogoproto \
+#	-Ivendor/github.com/gogo/googleapis \
+#        --python_out=/git/pyep11/generated/python_grpc --grpc_python_out=/git/pyep11/generated/python_grpc \
+#	&& mv /git/pyep11/generated/python_grpc/* /git \
+#	&& mv /git/pyep11/ep11.py /git
+
+# apt-get remove -y build-essential autoconf automake libtool && \
+
+#WORKDIR /git
 
 ###################################################################################
 # FROM python-grpc/Dockerfile
-WORKDIR /git
+##WORKDIR /git
 #ADD python-grpc/patches .
 #ENV EMBED_OPENSSL false
 #ENV CFLAGS "-Wno-error"
 #ENV GRPC_PYTHON_LDFLAGS "-lssl -lcrypto -Lthird_party/openssl-1.0.2f"
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends git patch make gcc g++ libc-dev libssl-dev autoconf automake libtool wget ca-certificates && \
+##RUN apt-get update && \
+##    apt-get install -y --no-install-recommends git patch make gcc g++ libc-dev libssl-dev autoconf automake libtool wget ca-certificates && \
 #    git clone -b v1.13.x https://github.com/grpc/grpc.git && \
 #    cd /git/grpc && \
 #    git submodule update --init && \
@@ -20,7 +75,7 @@ RUN apt-get update && \
 # building and installing openssl with two static libraries
 #    patch -i use_openssl.sh.patch /git/grpc/tools/openssl/use_openssl.sh && \
 #    cd /git/grpc/tools/openssl && \
-    apt-get install -y wget && \
+##    apt-get install -y wget && \
 #    ./use_openssl.sh && \
 # patching protobuf to support s390x
 #    cd /git/grpc && \
@@ -28,7 +83,7 @@ RUN apt-get update && \
 # building the grpc c core library from source
 # this also does make run 
 #    make install && \
-    apt-get install -y --no-install-recommends python3-pip python3-setuptools python3-dev python3-wheel
+##    apt-get install -y --no-install-recommends python3-pip python3-setuptools python3-dev python3-wheel
 # installing Cython to build packages for python
 #    pip3 install Cython
 # installing grpcio package for python
@@ -63,18 +118,19 @@ ENV ELECTRUM_PASSWORD passw0rd
 # RUN adduser --home $ELECTRUM_HOME --uid 2000 --disabled-password --disabled-login $ELECTRUM_USER
 
 WORKDIR /git
-ADD electrum/pyep11 /git/pyep11
+#ADD electrum/pyep11 /git/pyep11
+ADD pyep11 /git/pyep11
 #RUN apt-get update
-RUN apt-get install -y --no-install-recommends protobuf-compiler pyqt5-dev-tools && \
-    git clone https://github.com/tnakaike/electrum.git && \
+#RUN apt-get install -y --no-install-recommends protobuf-compiler pyqt5-dev-tools && \
+RUN  git clone https://github.com/tnakaike/electrum.git && \
     cd /git/electrum && \
     git checkout ${ELECTRUM_TAG} && \
     pip3 install . && \
 #   pyrcc5 icons.qrc -o gui/qt/icons_rc.py && \
 #   protoc --proto_path=lib/ --python_out=lib/ lib/paymentrequest.proto && \
     protoc --proto_path=electrum --python_out=electrum electrum/paymentrequest.proto && \
-#    pip3 install grpclib && \
-#    cd /git/pyep11 && \
+    pip3 install grpclib && \
+    cd /git/pyep11 && \
 #    python3 -m grpc_tools.protoc common/protos/*.proto generated/protos/*.proto \
 #        vendor/github.com/gogo/protobuf/gogoproto/*.proto \
 #        vendor/github.com/gogo/googleapis/google/api/*.proto \
@@ -83,6 +139,15 @@ RUN apt-get install -y --no-install-recommends protobuf-compiler pyqt5-dev-tools
 #	-Ivendor/github.com/gogo/googleapis \
 #        --python_out=generated/python_grpc --grpc_python_out=generated/python_grpc && \
 #    mv /git/pyep11/ep11.py /git/pyep11/pyep11.py /git/pyep11/generated/python_grpc/* /git/electrum && \
+    python3 -m grpc_tools.protoc common/protos/*.proto generated/protos/*.proto \
+        vendor/github.com/gogo/protobuf/gogoproto/*.proto \
+        vendor/github.com/gogo/googleapis/google/api/*.proto \
+        -Icommon/protos -Igenerated/protos \
+	-Ivendor/github.com/gogo/protobuf/gogoproto \
+	-Ivendor/github.com/gogo/googleapis \
+        --python_out=/git/pyep11/generated/python_grpc --grpc_python_out=/git/pyep11/generated/python_grpc \
+	&& mv /git/pyep11/generated/python_grpc/* /git/electrum \
+	&& mv /git/pyep11/ep11.py /git/electrum && \
     mkdir -p /data && chown ${ELECTRUM_USER} /data
 
 RUN apt-get install -y vim
@@ -104,98 +169,16 @@ ENV PYTHONPATH /git/electrum
 # CMD ["./entrypoint-load.sh"]
 
 
-
 ###################################################################################
 # FROM laravel/Dockerfile (mostly)
 
 ENV DEBIAN_FRONTEND noninteractive
-RUN apt-get install -y php7.2 apache2 curl xz-utils
+RUN apt-get install -y php apache2 curl xz-utils
 
 # install nodejs for php image
 # RUN apt-get update
 RUN apt-get install -y gnupg git
 
-## Dockerfile for a Node.js docker container from https://github.com/nodejs/docker-node/9/Dockerfile
-#
-# The MIT License (MIT)
-#
-# Copyright (c) 2015 Joyent, Inc.
-# Copyright (c) 2015 Node.js contributors
-#
-#Permission is hereby granted, free of charge, to any person obtaining a copy
-#of this software and associated documentation files (the "Software"), to deal
-#in the Software without restriction, including without limitation the rights
-#to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-#copies of the Software, and to permit persons to whom the Software is
-#furnished to do so, subject to the following conditions:
-#
-#The above copyright notice and this permission notice shall be included in all
-#copies or substantial portions of the Software.
-#
-#THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-#IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-#FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-#AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-#LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-#OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-#SOFTWARE.
-
-RUN set -ex \
-  && for key in \
-    94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
-    FD3A5288F042B6850C66B31F09FE44734EB7990E \
-    71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
-    DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
-    C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
-    B9AE9905FFD7803F25714661B63B535A4C206CA9 \
-    56730D5401028683275BD23C23EFEFE93C4CFFFE \
-    77984A986EBC2AA786BC0F66B01FBB92821C587A \
-  ; do \
-    gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-    gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-    gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
-  done
-
-ENV NODE_VERSION 9.11.1
-
-RUN ARCH= && dpkgArch="$(dpkg --print-architecture)" \
-  && case "${dpkgArch##*-}" in \
-    amd64) ARCH='x64';; \
-    ppc64el) ARCH='ppc64le';; \
-    s390x) ARCH='s390x';; \
-    arm64) ARCH='arm64';; \
-    armhf) ARCH='armv7l';; \
-    i386) ARCH='x86';; \
-    *) echo "unsupported architecture"; exit 1 ;; \
-  esac \
-  && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-$ARCH.tar.xz" \
-  && curl -SLO --compressed "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-  && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
-  && grep " node-v$NODE_VERSION-linux-$ARCH.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
-  && tar -xJf "node-v$NODE_VERSION-linux-$ARCH.tar.xz" -C /usr/local --strip-components=1 --no-same-owner \
-  && rm "node-v$NODE_VERSION-linux-$ARCH.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
-  && ln -s /usr/local/bin/node /usr/local/bin/nodejs
-
-ENV YARN_VERSION 1.5.1
-
-RUN set -ex \
-  && for key in \
-    6A010C5166006599AA17F08146C2130DFD2497F5 \
-  ; do \
-    gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key" || \
-    gpg --keyserver hkp://ipv4.pool.sks-keyservers.net --recv-keys "$key" || \
-    gpg --keyserver hkp://pgp.mit.edu:80 --recv-keys "$key" ; \
-  done \
-  && curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz" \
-  && curl -fSLO --compressed "https://yarnpkg.com/downloads/$YARN_VERSION/yarn-v$YARN_VERSION.tar.gz.asc" \
-  && gpg --batch --verify yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz \
-  && mkdir -p /opt \
-  && tar -xzf yarn-v$YARN_VERSION.tar.gz -C /opt/ \
-  && ln -s /opt/yarn-v$YARN_VERSION/bin/yarn /usr/local/bin/yarn \
-  && ln -s /opt/yarn-v$YARN_VERSION/bin/yarnpkg /usr/local/bin/yarnpkg \
-  && rm yarn-v$YARN_VERSION.tar.gz.asc yarn-v$YARN_VERSION.tar.gz
-
-## End of Dockerfile for a Node.js docker container
 
 WORKDIR /root
 # ENV APP_ROOT /git/laravel
@@ -220,7 +203,7 @@ RUN apt-get install -y sqlite3 libsqlite3-dev libpng-dev libzip-dev python vim p
 
 ###################################################################################
 # FROM laravel-electrum/Dockerfile
-RUN apt-get install -y php7.2-mbstring php7.2-xml php7.2-sqlite3
+RUN apt-get install -y php-mbstring php-xml php-sqlite3
 
 ENV APP_ROOT /var/www/html/electrum
 
