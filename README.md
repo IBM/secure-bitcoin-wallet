@@ -30,6 +30,7 @@ Just clone a monolithic-multistage branch from this repo and build a container o
 
 ```
 $ git clone https://github.com/IBM/secure-bitcoin-wallet.git
+$ cd secure-bitcoin-wallet
 $ git checkout monolithic-multistage
 $ docker build -t secure-bitcoin-wallet .
 ```

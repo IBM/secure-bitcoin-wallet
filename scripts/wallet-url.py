@@ -7,9 +7,13 @@ import platform
 import os
 from subprocess import check_output
 
+if len(sys.argv) == 3:
+    username = sys.argv[1]
+    walletname = sys.argv[2]
+    wallet = username + "-" + walletname + "-wallet"
 if len(sys.argv) == 2:
     walletname = sys.argv[1]
-    wallet = os.environ['USER'] + "-" + walletname + "-laravel"
+    wallet = os.environ['USER'] + "-" + walletname + "-wallet"
 else:    
     print(sys.argv[0] + " walletname")
     sys.exit(0)
