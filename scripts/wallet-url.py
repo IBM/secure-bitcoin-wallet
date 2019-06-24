@@ -11,7 +11,7 @@ if len(sys.argv) == 3:
     username = sys.argv[1]
     walletname = sys.argv[2]
     wallet = username + "-" + walletname + "-wallet"
-if len(sys.argv) == 2:
+elif len(sys.argv) == 2:
     walletname = sys.argv[1]
     wallet = os.environ['USER'] + "-" + walletname + "-wallet"
 else:    
