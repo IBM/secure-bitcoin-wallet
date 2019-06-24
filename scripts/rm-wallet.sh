@@ -1,9 +1,10 @@
 #!/bin/bash
 
-if [ $# == 1 ] ; then
-    wallet=$1
+if [ $# == 2 ] ; then
+    user=$1
+    wallet=$2
 else
-    echo "usage: "$0" <walletname>"
+    echo "usage: "$0" <username> <walletname> (e.g. demo0 charlie)"
     exit
 fi
 echo "wallet="$wallet
@@ -22,8 +23,8 @@ else
 fi
 
 # removing electrum-daemon and laravel-electrum containers for "$wallet"
-docker rm -f $USER-$wallet-wallet $USER-$wallet-laravel
+docker rm -f $user-$wallet-wallet
 # removing wallet and wallet-db volumes for "$wallet"
-docker volume rm $USER-$wallet $USER-$wallet-db
+docker volume rm $wallet
 
 
