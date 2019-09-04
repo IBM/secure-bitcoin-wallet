@@ -21,9 +21,9 @@ case "${dpkgArch##*-}" in
     *) echo "unsupported architecture"; exit 1 ;;
 esac
 if [ "${ARCH}" = "s390x" ]; then
-    TITLE="Secure Bitcoin Wallet on IBM LinuxONE"
+    TITLE="Secure Token Wallet on IBM LinuxONE"
 else
-    TITLE="Bitcoin Wallet on "${ARCH}" Linux"
+    TITLE="Token Wallet on "${ARCH}" Linux"
 fi
 echo $TITLE
 
