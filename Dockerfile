@@ -125,6 +125,7 @@ ADD pyep11 /git/pyep11
 RUN  git clone https://github.com/tnakaike/electrum.git && \
     cd /git/electrum && \
     git checkout ${ELECTRUM_TAG} && \
+    pip3 uninstall -y enum34 && \
     pip3 install . && \
 #   pyrcc5 icons.qrc -o gui/qt/icons_rc.py && \
 #   protoc --proto_path=lib/ --python_out=lib/ lib/paymentrequest.proto && \
