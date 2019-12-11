@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -17,12 +17,7 @@ else:
     print(sys.argv[0] + " -h | --help")
     sys.exit(0)
 
-if platform.machine() == 's390x':
-    env = "DOCKER_HOST=tcp://$SSC_HOST:2376 DOCKER_TLS_VERIFY=1 DOCKER_CERT_PATH=/etc/docker/cert.d/$SSC_HOST "
-else:
-    env = ""
-
-cmd = env + "docker inspect --format '{{.State.Pid}}' " + wallet
+cmd = "docker inspect --format '{{.State.Pid}}' " + wallet
 try:
     ppid = check_output(cmd, shell=True).rstrip().decode('utf8')
 except:
@@ -35,9 +30,9 @@ cmd = "ps -eaf"
 processes = check_output(cmd, shell=True).rstrip().decode('utf8').split('\n')
 
 for process in processes:
-    if process.split()[2] == ppid and process.find("python3 electrum daemon") != -1:
+    if process.split()[2] == ppid and process.find("python3 ./run_electrum daemon") != -1:
         pid = process.split()[1]
-        print("wallet container: " + wallet + " pid: " + pid)
+        print(pid)
 
 
 
