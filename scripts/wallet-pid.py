@@ -32,7 +32,7 @@ processes = check_output(cmd, shell=True).rstrip().decode('utf8').split('\n')
 for process in processes:
     if process.split()[2] == ppid and process.find("python3 ./run_electrum daemon") != -1:
         pid = process.split()[1]
-        print("wallet container: " + wallet + " pid: " + pid)
+        print(pid)
 
 
 

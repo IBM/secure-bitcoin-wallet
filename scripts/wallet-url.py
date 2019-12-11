@@ -15,7 +15,7 @@ elif len(sys.argv) == 2:
     walletname = sys.argv[1]
     wallet = os.environ['USER'] + "-" + walletname + "-wallet"
 else:    
-    print(sys.argv[0] + " walletname")
+    print(sys.argv[0] + " [username] alletname")
     sys.exit(0)
 
 cmd = "docker inspect --format='{{(index (index .NetworkSettings.Ports \"443/tcp\") 0).HostPort}}' " + wallet
