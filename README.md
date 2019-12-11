@@ -14,7 +14,7 @@ The [Electrum frontend](/laravel-electrum), a modified version of [Electrum for 
 runs as a Web frontend to interact with bitcoin users via a Web browser.
 It runs on [Laravel](https://laravel.com/), an emerging application framework written in PHP taking advantage of NodeJS for client-side rendering.
 In this monolithic version, these two componets are configured to run in a single Docker container on x86 or in a single Hyper Protect Virtual Server on a 
-LinuexONE Secure Service Container (SSC).
+LinuxONE Secure Service Container (SSC).
 
 ![A blockdiagram](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/blockdiagram-monolithic.png)*Block Diagram*
 
@@ -56,7 +56,7 @@ Use a Web browser to access the electrum wallet.
 - Access https://hostname:port/electrum again if not redirected automatically.
 - Create and load a wallet from a Wallet tab.
 - Reload the browser.
-- Select one of three tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign) to interact with the wallet.
+- Select one of three tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign`) to interact with the wallet.
 
 ### Additional note
 
