@@ -15,8 +15,8 @@ export ELECTRUM_DAEMON_HOST=localhost
 
 # start an electrum daemon
 pushd /git/electrum
-./entrypoint-load.sh
+./entrypoint-electrum.sh
 popd
 
 # start a laravel frontend with apache2
-./entrypoint.sh
+./entrypoint-laravel.sh
