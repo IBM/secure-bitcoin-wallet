@@ -1,3 +1,0 @@
-#!/bin/bash
-CERTS=/etc/docker/cert.d/$SSC_HOST
-docker --tlsverify --tlscacert=$CERTS/ca.pem --tlscert=$CERTS/cert.pem --tlskey=$CERTS/key.pem -H=$SSC_HOST:2376 $*
