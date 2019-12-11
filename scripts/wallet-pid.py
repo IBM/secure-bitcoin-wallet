@@ -17,12 +17,7 @@ else:
     print(sys.argv[0] + " -h | --help")
     sys.exit(0)
 
-if platform.machine() == 's390x':
-    env = "DOCKER_HOST=tcp://$SSC_HOST:2376 DOCKER_TLS_VERIFY=1 DOCKER_CERT_PATH=/etc/docker/cert.d/$SSC_HOST "
-else:
-    env = ""
-
-cmd = env + "docker inspect --format '{{.State.Pid}}' " + wallet
+cmd = "docker inspect --format '{{.State.Pid}}' " + wallet
 try:
     ppid = check_output(cmd, shell=True).rstrip().decode('utf8')
 except:
