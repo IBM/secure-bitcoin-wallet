@@ -31,7 +31,6 @@ Just clone a monolithic-multistage branch from this repo and build a container o
 ```
 $ git clone https://github.com/IBM/secure-bitcoin-wallet.git
 $ cd secure-bitcoin-wallet
-$ git checkout monolithic-multistage
 $ docker build -t secure-bitcoin-wallet .
 ```
 
@@ -42,11 +41,11 @@ The *WALLET_VOLUME* and *PORT* should be a unique wallet volume name and port nu
 The *ZHSM* specifies the hostname of an ep11 server to use ZHSM. If this is not set, a default software AES is used.
 
 ```
-$ WALLET_VOLUME=<wallet-volume-name> (e.g. alice)
+$ WALLET_NAME=<wallet-name> (e.g. alice)
 $ WALLET_USER=<wallet-user-name> (e.g. demo0)
 $ PORT=<external-https-port>
 $ ZHSM=<ep11server-address> (optional)
-$ docker run -d -v ${WALLET_VOLUME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} --name ${WALLET_USER}-${WALLET_VOLUME}-wallet secure-bitcoin-wallet
+$ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} --name ${WALLET_USER}-${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
 Use a Web browser to access the electrum wallet.
@@ -74,7 +73,7 @@ $ docker volume inspect ${WALLET_VOLUME}
 To load a previously created wallet with a password in a docker volume, run the following command to create a wallet container
 
 ```
-$ docker run -d -v ${WALLET_VOLUME}:/data -e WALLET=/data/electrum/testnet/wallets/default_wallet -e PASSWORD={wallet-password} -p ${PORT}:443 -e ZHSM=${ZHSM} --name wallet-${WALLET_VOLUME} secure-bitcoin-wallet
+$ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -e WALLET=/data/electrum/testnet/wallets/default_wallet -e PASSWORD={wallet-password} -p ${PORT}:443 -e ZHSM=${ZHSM} --name ${WALLET_USER}-${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
 ## License
