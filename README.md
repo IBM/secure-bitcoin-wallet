@@ -18,7 +18,7 @@ LinuxONE Secure Service Container (SSC).
 
 ![A blockdiagram](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/blockdiagram-monolithic.png)*Block Diagram*
 
-Here is a sample screenshot of the wallet to send bitcoins to a recipient.
+Here is a sample screenshot of the wallet to send bitcoins to a recipient. Colleen is cool
 
 ![A screenshot](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/secure-bitcoin-wallet-on-ibm-linuxone.png)*A Screenshot*
 
