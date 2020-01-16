@@ -9,24 +9,19 @@ Cryptocurrencies, such as bitcoin, require top level protection as hackers look 
 To start, we'll create an IBM Cloud Hyper Protect Virtual Server
 instance, which requires a generated SSH key pair to ensure only the user has access to the instance. We'll then build and deploy the python backend application. Finally, we'll build and deploy the Electrum Bitcoin a node.js application using
 the Express framework to serve a static website employing jQuery to
-make requests to the python backend app. This, in turn, can be served
-over HTTPS. The result is a donations website that can accept credit
-card details, and send some of this sensitive information to a
-database, ensuring it's encrypted at all times. By running the
-applications on an IBM Cloud Hyper Protect Virtual Server, we can
-ensure that the storage used by the applications is also encrypted.
+make requests to the python backend app. The result is a Digital Wallet application that can accept user info to access Bitcoin funds on the cloud. By running the application in an IBM Cloud Hyper Protect Virtual Server, we can
+ensure that the storage used by the applications is also encrypted. Additionally, with IBM Cloud Hyper Protect Crypto Services, we can ensure that the application itself is encrypted with keys stored in the tamper-proof HSM.
 
-When you've completed this code pattern, you'll know how to:
 
-- Build and run Docker containers
-- Deploy a python RESTful interface to a MongoDB database
-- Deploy a node.js Express application to serve a static website
-- Build and run an Nginx reverse proxy in Cloud Foundry, to provide
-  TLS
+When you have completed this code pattern, you will understand how to:
+
+Build and run a Etherum Bitcoin digital wallet application
+Stand up an IBM Cloud Hyper Protect Virtual Server
+(Optional) Integrate with IBM Cloud Hyper Protect Crypto Services to encrypt the wallet
 
 Flow:
-![Disaster donations diagram](./diagram.png)
+![Bitcoin Wallet Diagram](./diagram.png)
 
 Instructions:
 
-Find detailed steps for this pattern in the README file
+Find detailed steps for this pattern in the [README file] (https://github.com/cgallagher-129/secure-bitcoin-wallet/blob/master/README.md).
