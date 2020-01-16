@@ -1,4 +1,4 @@
-## Bitcoin Digital Wallet
+# Bitcoin Digital Wallet
 
 In this code pattern, we will deploy a Digital Wallet application in the public cloud. As digital wallets are targeted by hackers, it is important that the digital assets be protected in an environment that is also easily accessible by the user - also known as a "hot wallet". This includes having an environment where privileged admins nor external threats can compromise the data, via encryption and other mechanisms.
 
@@ -26,7 +26,7 @@ The frontend and backend applications can both be run locally, or in
 the IBM Cloud in a Linux VM, for example an [IBM Cloud Hyper Protect
 Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
 
-# How to build the application
+### How to build the application
 
 Start by cloning a monolithic-multistage branch from this repo and build a container out of it.
 
@@ -36,12 +36,12 @@ $ cd secure-bitcoin-wallet
 $ docker build -t secure-bitcoin-wallet .
 ```
 
-# How to run the application
+### How to run the application
 
 The following sequence of commands starts a monolithic wallet container.
 The *WALLET_VOLUME* and *PORT* should be a unique wallet volume name and port number, respectively, on the host. 
 
-# How to encrypt the wallet (optional)
+### How to encrypt the wallet (optional)
 The *ZHSM* specifies the hostname of an ep11 server to use ZHSM. If this is not set, a default software AES is used.
 
 ```
@@ -52,7 +52,7 @@ $ ZHSM=<ep11server-address> (optional)
 $ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} --name ${WALLET_USER}-${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
-# Use a Web browser to access the electrum wallet.
+### Use a Web browser to access the electrum wallet.
 
 ```
 - Access https://hostname:port/electrum from a browser with the port number specified for the container.
@@ -70,7 +70,7 @@ Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
 ![A screenshot](./screenshot.png)
 
-## WARNING: This software is for demonstration purposes only. Use at your own risk.
+### WARNING: This software is for demonstration purposes only. Use at your own risk.
 
 
 ### Additional note
