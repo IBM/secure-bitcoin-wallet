@@ -24,4 +24,4 @@ Flow:
 
 Instructions:
 
-Find detailed steps for this pattern in the [README file] (https://github.com/cgallagher-129/secure-bitcoin-wallet/blob/master/README.md).
+Find detailed steps for this pattern in the[README file](/README).
