@@ -26,7 +26,7 @@ The frontend and backend applications can both be run locally, or in
 the IBM Cloud in a Linux VM, for example an [IBM Cloud Hyper Protect
 Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
 
-#How to build the application
+##How to build the application
 
 Start by cloning a monolithic-multistage branch from this repo and build a container out of it.
 
@@ -34,13 +34,14 @@ Start by cloning a monolithic-multistage branch from this repo and build a conta
 $ git clone https://github.com/IBM/secure-bitcoin-wallet.git
 $ cd secure-bitcoin-wallet
 $ docker build -t secure-bitcoin-wallet .
+```
 
-#How to run the application
+##How to run the application
 
 The following sequence of commands starts a monolithic wallet container.
 The *WALLET_VOLUME* and *PORT* should be a unique wallet volume name and port number, respectively, on the host. 
 
-#How to encrypt the wallet (optional)
+##How to encrypt the wallet (optional)
 The *ZHSM* specifies the hostname of an ep11 server to use ZHSM. If this is not set, a default software AES is used.
 
 ```
@@ -51,8 +52,9 @@ $ ZHSM=<ep11server-address> (optional)
 $ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} --name ${WALLET_USER}-${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
-#Use a Web browser to access the electrum wallet.
+##Use a Web browser to access the electrum wallet.
 
+```
 - Access https://hostname:port/electrum from a browser with the port number specified for the container.
 - Accept a warning on a browser to use a self-signed certificate.
 - Click "register" to register name, e-mail address, and password, for the first time. Or click "login" if already registered.
@@ -60,6 +62,8 @@ $ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${
 - Create and load a wallet from a Wallet tab.
 - Reload the browser.
 - Select one of three tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign`) to interact with the wallet.
+
+```
 
 Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
