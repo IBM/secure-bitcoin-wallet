@@ -4,7 +4,7 @@ Summary:
 In this code pattern, learn how to deploy a Digital Wallet application with a Web Frontend and an Electrum Bitcoin Client in an IBM Cloud Hyper Protect Virtual Server using [Electrum 3.3.6](https://github.com/spesmilo/electrum/tree/3.3.6). The application will be deployed in an IBM Cloud Hyper Protect Virtual Server while integrating with IBM Cloud Hyper Protect Crypto Services to encrypt the Bitcoin wallet. This integration is optional - but adds another layer of security.
 
 Description:
-Cryptocurrencies, such as bitcoin, require top level protection as hackers look to steal these digital assets. Using a digital wallet can be a secure way of keeping cryptocurrency safe. In this example, we can create a digital wallet deployed in the public cloud for easy access while still maintaining high security with IBM Cloud Hyper Protect Services.
+Cryptocurrencies, such as bitcoin, require top level protection as hackers look to steal these digital assets. Digital wallets need to be secure to keep the currency safe. In this example, we can create a digital wallet deployed in the public cloud for easy access while still maintaining high security with IBM Cloud Hyper Protect Services.
 
 To start, we'll create an IBM Cloud Hyper Protect Virtual Server
 instance, which requires a generated SSH key pair to ensure only the user has access to the instance. We'll then build and deploy the python backend application. Finally, we'll build and deploy the Electrum Bitcoin a node.js application using
@@ -24,4 +24,4 @@ Flow:
 
 Instructions:
 
-Find detailed steps for this pattern in the[README file](/README).
+Find detailed steps for this pattern in the [README file](/README).
