@@ -26,9 +26,39 @@ The frontend and backend applications can both be run locally, or in
 the IBM Cloud in a Linux VM, for example an [IBM Cloud Hyper Protect
 Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
 
-### How to build the application
+### Create your IBM Cloud Hyper Protect Virtual Server Instance
 
-Start by cloning a monolithic-multistage branch from this repo and build a container out of it.
+### Log into your Virtual Server
+
+1. From the [IBM Cloud Catalog](https://cloud.ibm.com/catalog), search for *Hyper Protect Virtual Server* and select **Hyper Protect Virtual Server**.
+
+   ![Search for Hyper Protect Virtual Server.](images/SearchHPVS.png)
+
+2. Complete the following fields to create your virtual server.
+
+   * Select the  **Lite** plan.
+
+   * Enter a *Service name*: DonationsVS
+
+   * Copy and paste in the public half of a SSH key. If you don't one already, please follow the guide [here]( https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys).
+
+   * Select **Create**.
+
+     ![Configure your Hyper Protect Virtual Server.](images/HPVSFields.png)
+
+
+### How to build the Wallet application
+
+Start by installing git and docker.
+
+```
+apt-get install -y git
+git clone https://github.com/IBM/secure-bitcoin-wallet.git
+cd secure-bitcoin-wallet
+docker build -t secure-bitcoin-wallet
+```
+
+To build the application, clone a monolithic-multistage branch from this repo and build a container out of it.
 
 ```
 $ git clone https://github.com/IBM/secure-bitcoin-wallet.git
