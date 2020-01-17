@@ -15,9 +15,9 @@ ensure that the storage used by the applications is also encrypted. Additionally
 
 When you have completed this code pattern, you will understand how to:
 
-Build and run a Etherum Bitcoin digital wallet application
-Stand up an IBM Cloud Hyper Protect Virtual Server
-(Optional) Integrate with IBM Cloud Hyper Protect Crypto Services to encrypt the wallet
+- Build and run a Etherum Bitcoin digital wallet application
+- Stand up an IBM Cloud Hyper Protect Virtual Server
+- (Optional) Integrate with IBM Cloud Hyper Protect Crypto Services to encrypt the wallet
 
 Flow:
 ![Bitcoin Wallet Diagram](./diagram.png)
