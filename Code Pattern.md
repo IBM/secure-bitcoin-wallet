@@ -24,4 +24,4 @@ Flow:
 
 Instructions:
 
-Find detailed steps for this pattern in the [README file](/README).
+Find detailed steps for this pattern in the [README file](./README).
