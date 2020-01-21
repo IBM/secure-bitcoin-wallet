@@ -32,7 +32,7 @@ Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-ser
 
 1. From the [IBM Cloud Catalog](https://cloud.ibm.com/catalog), search for *Hyper Protect Virtual Server* and select **Hyper Protect Virtual Server**.
 
-   ![Search for Hyper Protect Virtual Server.](images/SearchHPVS.png)
+   ![Search for Hyper Protect Virtual Server.](./SearchHPVS.png)
 
 2. Complete the following fields to create your virtual server.
 
@@ -44,7 +44,7 @@ Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-ser
 
    * Select **Create**.
 
-     ![Configure your Hyper Protect Virtual Server.](images/HPVSFields.png)
+     ![Configure your Hyper Protect Virtual Server.](./HPVSFields.png)
 
 
 ### How to build the Wallet application
