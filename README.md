@@ -2,10 +2,9 @@
 
 In this code pattern, we will deploy a Digital Wallet application in the public cloud. As digital wallets are targeted by hackers, it is important that the digital assets be protected in an environment that is also easily accessible by the user - also known as a "hot wallet". This includes having an environment where privileged admins nor external threats can compromise the data, via encryption and other mechanisms.
 
-The Digital Wallet application consists of a [Web frontend] (/laravel-electrum)and the [Electrum Bitcoin Client backend](/electrum), a modified version of [Electrum](https://github.com/spesmilo/electrum). The [Electrum Bitcoin Client backend](/electrum) runs as a JSON RPC server to maintain a bitcoin wallet by interacting with the bitcoin network. 
+The Digital Wallet application consists of a [Web frontend] (/laravel-electrum)and the [Electrum Bitcoin Client backend](/electrum), a modified version of [Electrum](https://github.com/spesmilo/electrum). The [Electrum Bitcoin Client backend](/electrum) runs as a JSON RPC server to maintain a bitcoin wallet by interacting with the bitcoin network. It uses Node.js for the rendering on the client (browser).
 
-The Web frontend runs on [Laravel](https://laravel.com/), an emerging application framework written in PHP taking advantage of NodeJS for client-side rendering.
-These two components are configured to run in a single [IBM Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
+The Web frontend runs on [Laravel](https://laravel.com/), an emerging application framework written in PHP. These two components are configured to run in a single [IBM Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
 
 It can optionally encrypt/decrypt a wallet file using [IBM Cloud Hyper Protect Crypto Services](https://cloud.ibm.com/catalog/services/hyper-protect-crypto-services) (zHSM) to protect the encryption key. 
 
