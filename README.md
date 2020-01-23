@@ -32,22 +32,9 @@ You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virt
 
 ### Log into your Virtual Server
 
-1. From the [IBM Cloud Catalog](https://cloud.ibm.com/catalog), search for *Hyper Protect Virtual Server* and select **Hyper Protect Virtual Server**.
+   * Make sure to copy and paste in the public half of a SSH key. If you don't one already, please follow the guide [here]( https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys).
 
-   ![Search for Hyper Protect Virtual Server.](./SearchHPVS.png)
-
-2. Complete the following fields to create your virtual server.
-
-   * Select the  **Lite** plan.
-
-   * Enter a *Service name*: DonationsVS
-
-   * Copy and paste in the public half of a SSH key. If you don't one already, please follow the guide [here]( https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys).
-
-   * Select **Create**.
-
-     ![Configure your Hyper Protect Virtual Server.](./HPVSFields.png)
-
+  You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-connect_vs).
 
 ### How to build the Wallet application
 
