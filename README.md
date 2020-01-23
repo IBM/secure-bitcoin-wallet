@@ -29,11 +29,11 @@ Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-ser
 
 You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-provision).
 
-### Log into your Virtual Server
-
    * Make sure to copy and paste in the public half of a SSH key. If you don't one already, please follow the guide [here]( https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys).
 
-  You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-connect_vs).
+### Log into your Virtual Server
+
+You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-connect_vs).
 
 ### How to build the Wallet application
 
