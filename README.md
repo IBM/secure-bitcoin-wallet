@@ -28,6 +28,8 @@ Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-ser
 
 ### Create your IBM Cloud Hyper Protect Virtual Server Instance
 
+You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-provision).
+
 ### Log into your Virtual Server
 
 1. From the [IBM Cloud Catalog](https://cloud.ibm.com/catalog), search for *Hyper Protect Virtual Server* and select **Hyper Protect Virtual Server**.
