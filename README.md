@@ -40,18 +40,24 @@ You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virt
 Start by installing git and docker.
 
 ```
-apt-get install -y git
-git clone https://github.com/IBM/secure-bitcoin-wallet.git
-cd secure-bitcoin-wallet
-docker build -t secure-bitcoin-wallet
+$ apt-get install -y git docker.io
 ```
 
-To build the application, clone a monolithic-multistage branch from this repo and build a container out of it.
+To build the application, clone the master branch from this repo and build a container out of it.
 
 ```
 $ git clone https://github.com/IBM/secure-bitcoin-wallet.git
 $ cd secure-bitcoin-wallet
 $ docker build -t secure-bitcoin-wallet .
+```
+
+In default, this builds a grpc python library from source code, which is used to access
+Hyper Protect Crypto Service (HPCS). To skip building the library, add
+`NO_GRPC_BUILD=1` as a build argument. This reduces the time and resources (e.g. memory) to
+build a container image, if you are not planning to use HPCS.
+
+```
+$ docker build --build-arg NO_GRPC_BUILD=1 -t secure-bitcoin-wallet .
 ```
 
 ### How to run the application
@@ -60,7 +66,8 @@ The following sequence of commands starts a monolithic wallet container.
 The *WALLET_VOLUME* and *PORT* should be a unique wallet volume name and port number, respectively, on the host. 
 
 ### How to encrypt the wallet (optional)
-The *ZHSM* specifies the hostname of an ep11 server to use ZHSM. If this is not set, a default software AES is used.
+The *ZHSM* specifies the hostname of an HPCS instance. If this is not set, a default software AES is used.
+Current code supports only an on-prem version of HPCS.
 
 ```
 $ WALLET_NAME=<wallet-name> (e.g. alice)

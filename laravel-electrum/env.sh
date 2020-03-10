@@ -4,10 +4,8 @@ APP_KEY=`grep APP_KEY=base64 .env | sed s/APP_KEY=//`
 
 echo $APP_KEY
 
-sed "s|'APP_KEY'|'APP_KEY','$APP_KEY'|" < config/app.php | sed "s|'UTC'|'UTC'|" > config/app.php.new
-diff config/app.php config/app.php.new
-mv config/app.php.new config/app.php
-
+sed --in-place "s|'APP_KEY'|'APP_KEY','$APP_KEY'|" config/app.php
+sed --in-place "s|'UTC'|'UTC'|" config/app.php
 
 ARCH=
 dpkgArch="$(dpkg --print-architecture)"
@@ -27,17 +25,16 @@ else
 fi
 echo $TITLE
 
-sed s/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/ < .env | \
-sed s/DB_HOST=127.0.0.1/\#DB_HOST=127.0.0.1/  | \
-sed s/DB_PORT=3306/\#DB_PORT=3306/  | \
-sed "s|DB_DATABASE=homestead|DB_DATABASE=$APP_ROOT/database/development.sqlite3|" | \
-#sed s/DB_DATABASE=homestead/DB_DATABASE=\\/git\\/laravel\\/database\\/development.sqlite3/ | \
-sed s/DB_USERNAME=homestead/\#DB_USERNAME=homestead/ | \
-sed s/DB_PASSWORD=secret/\#DB_PASSWORD=secret/ | \
-sed "s|APP_NAME=Laravel|APP_NAME=\"${TITLE}\"|" > .env.new
-diff .env.new .env
-mv .env.new .env
+cp .env .env.orig
+sed --in-place s/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/ .env
+sed --in-place s/DB_HOST=127.0.0.1/\#DB_HOST=127.0.0.1/ .env
+sed --in-place s/DB_PORT=3306/\#DB_PORT=3306/ .env
+sed --in-place "s|DB_DATABASE=homestead|DB_DATABASE=$APP_ROOT/database/development.sqlite3|" .env
+sed --in-place s/DB_USERNAME=homestead/\#DB_USERNAME=homestead/ .env
+sed --in-place s/DB_PASSWORD=secret/\#DB_PASSWORD=secret/ .env
+sed --in-place "s|APP_NAME=Laravel|APP_NAME=\"${TITLE}\"|" .env
 
+diff .env .env.orig
 
 # sed s/right/left/  < resources/views/layouts/app.blade.php > resources/views/layouts/app.blade.php.new
 # diff resources/views/layouts/app.blade.php resources/views/layouts/app.blade.php.new
