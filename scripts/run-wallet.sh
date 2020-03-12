@@ -15,11 +15,20 @@ echo "wallet="$wallet
 DOCKER_CONTENT_TRUST=${DOCKER_CONTENT_TRUST:-0}
 CONTAINER_IMAGE=${CONTAINER_IMAGE:-secure-bitcoin-wallet}
 
-declare -A ports=( [charlie]=4431 [devil]=4432 [eddy]=4433 )
-if [ ${ports[$wallet]+_} ]; then
-    portmap=${ports[$wallet]}:443
+# associative array doesn't work on Mac with bash 3.x
+# declare -A ports=([charlie]=4431 [devil]=4432 [eddy]=4433)
+
+# this works both on Mac and Linux
+declare port_charlie=4431 port_devil=4432 port_eddy=4433
+port=port_$wallet
+port=${!port}
+
+if [ ${port} ]; then
+    portmap=$port:443
 else
     portmap=443
 fi
+
+echo $portmap
 docker run -d -v $user-$wallet:/data -p ${portmap} --name $user-$wallet-wallet $CONTAINER_IMAGE
 
