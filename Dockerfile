@@ -41,7 +41,7 @@ RUN apt-get update && \
 
 ###################################################################################
 
-ARG ELECTRUM_TAG="local-3.3.6-ep11"
+ARG ELECTRUM_TAG="local-3.3.6-hpcs"
 
 ENV NETWORK "--testnet"
 # ENV ELECTRUM_USER electrum
