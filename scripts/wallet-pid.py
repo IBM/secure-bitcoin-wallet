@@ -19,22 +19,33 @@ else:
 
 cmd = "docker inspect --format '{{.State.Pid}}' " + wallet
 try:
-    ppid = check_output(cmd, shell=True).rstrip().decode('utf8')
+    root_pid = check_output(cmd, shell=True).rstrip().decode('utf8')
 except:
     print("wallet container not found")
     sys.exit(-1)
 
-#print("ppid: " + ppid)
-
 cmd = "ps -eaf"
 processes = check_output(cmd, shell=True).rstrip().decode('utf8').split('\n')
 
+electrum_pid = ''
+sh_pid = ''
+
 for process in processes:
-    if process.split()[2] == ppid and process.find("python3 ./run_electrum daemon") != -1:
-        pid = process.split()[1]
-        print(pid)
+    if process.split()[2] == root_pid and process.find("python3 ./run_electrum daemon") != -1:
+        electrum_pid = process.split()[1]
+        print(electrum_pid)
+        sys.exit(0)
+    elif process.split()[2] == root_pid and process.find("entrypoint-electrum.sh") != -1:
+        sh_pid = process.split()[1]
 
+if sh_pid != '':
+    for process in processes:
+        if process.split()[2] == sh_pid and process.find("python3 ./run_electrum daemon") != -1:
+            electrum_pid = process.split()[1]
+            print(electrum_pid)
+            sys.exit(0)
 
+print("electrum process not found")
 
 
 
