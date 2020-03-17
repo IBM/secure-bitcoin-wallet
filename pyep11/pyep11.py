@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 import os, sys, json, grpc, sqlite3, binascii, time
-import ep11, grep11_pb2, pkcs11_pb2, server_pb2, server_pb2_grpc, grep11_pb2_grpc 
+import grep11constants as ep11, grep11_pb2, pkcs11_pb2, server_pb2, server_pb2_grpc, grep11_pb2_grpc 
 from subprocess import check_output
 
 endian = 'big'
