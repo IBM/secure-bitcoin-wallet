@@ -5,8 +5,7 @@ FROM python:3.7-slim-stretch
 
 COPY --from=node /usr/local /usr/local
 
-WORKDIR /git
-ENV GRPC_PYTHON_BUILD_SYSTEM_OPENSSL 1
+ARG GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
 
 ARG NO_GRPC_BUILD
 
@@ -18,23 +17,6 @@ RUN apt-get update && \
     apt-get install -y --no-install-recommends sqlite3 libsqlite3-dev libpng-dev libzip-dev python php-zip && \
     apt-get install -y --no-install-recommends php-mbstring php-xml php-sqlite3 unzip && \
     apt-get install -y --no-install-recommends supervisor && \
-# building the grpc c core library from source
-    if [ -z "$NO_GRPC_BUILD" ]; then \
-       git clone -b v1.26.0 https://github.com/grpc/grpc.git; \
-       cd /git/grpc; \
-       git submodule update --init; \
-       make install; \
-# installing Cython to build packages for python
-       pip3 install Cython; \
-# installing grpcio package for python
-       cd /git/grpc; \
-       pip3 install -rrequirements.txt; \
-       GRPC_PYTHON_BUILD_WITH_CYTHON=1 pip3 install .; \
-# installing grpcio-tools package for python
-       cd /git/grpc/tools/distrib/python/grpcio_tools; \
-       python3 ../make_grpcio_tools.py; \
-       GRPC_PYTHON_BUILD_WITH_CYTHON=1 pip3 install .; \
-    fi && \
 # clean up
     apt-get -y autoremove && apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/tmp/* /git/grpc
@@ -62,16 +44,16 @@ RUN git clone https://github.com/tnakaike/electrum.git && \
     pip3 uninstall -y enum34 && \
     pip3 install . && \
     protoc --proto_path=electrum --python_out=electrum electrum/paymentrequest.proto && \
-    pip3 install grpclib && \
+    cd /git/pyep11 && \
     if [ -z "$NO_GRPC_BUILD" ]; then \
-       cd /git/pyep11; \
+       pip3 install grpclib grpcio-tools; \
        python3 -m grpc_tools.protoc common/protos/*.proto generated/protos/*.proto \
-          vendor/github.com/gogo/protobuf/gogoproto/*.proto \
-          vendor/github.com/gogo/googleapis/google/api/*.proto \
-          -Icommon/protos -Igenerated/protos \
-	  -Ivendor/github.com/gogo/protobuf/gogoproto \
-	  -Ivendor/github.com/gogo/googleapis \
-          --python_out=/git/pyep11/generated/python_grpc --grpc_python_out=/git/pyep11/generated/python_grpc; \
+              vendor/github.com/gogo/protobuf/gogoproto/*.proto \
+              vendor/github.com/gogo/googleapis/google/api/*.proto \
+              -Icommon/protos -Igenerated/protos \
+	      -Ivendor/github.com/gogo/protobuf/gogoproto \
+	      -Ivendor/github.com/gogo/googleapis \
+              --python_out=/git/pyep11/generated/python_grpc --grpc_python_out=/git/pyep11/generated/python_grpc; \
        mv /git/pyep11/generated/python_grpc/* /git/electrum; \
        mv /git/pyep11/pyep11.py /git/electrum; \
        mv /git/pyep11/ep11.py /git/electrum; \

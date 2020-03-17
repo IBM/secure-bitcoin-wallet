@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-import os, sys, json, grpc, sqlite3, binascii
+import os, sys, json, grpc, sqlite3, binascii, time
 import ep11, grep11_pb2, pkcs11_pb2, server_pb2, server_pb2_grpc, grep11_pb2_grpc 
 from subprocess import check_output
 
@@ -13,88 +13,81 @@ class AES:
         self.apikey = os.environ.get('APIKEY')
         self.instance = os.environ.get('INSTANCE_ID')
         self.endpoint = os.environ.get('IAM_ENDPOINT', 'https://iam.cloud.ibm.com')
-        
-        self.access_token = ''
-        self.retry = False
-        
-        if not self.zhsm:
-            print("$ZHSM environment variable is not set, defaulting to the original software AES")
-            return
-        
-        print("zHSM=" + self.zhsm)
-        if self.zhsm and (not self.apikey or not self.instance):
-            print("$APIKEY or $INSTANCE_ID environment variable is not set - accessing an on-prem grep11 at " + self.zhsm)
-            return
-        
-        if self.zhsm and self.apikey and self.instance:
-            print("accessing an on-cloud HPCS (grep11) at " + self.zhsm)
-            
-        # print("APIKEY=" + self.apikey)
-        print("INSTANCE_ID=" + self.instance)
-        print("ENDPOINT=" + self.endpoint)
-
+        self.channel = self.get_channel()
 
     class AuthPlugin(grpc.AuthMetadataPlugin):
         
-        def __init__(self, instance_id, access_token):
-            self._instance_id = instance_id
-            self._access_token = access_token
+        def __init__(self, instance, apikey, endpoint):
+            self._instance = instance
+            self._apikey = apikey
+            self._endpoint = endpoint
+            self._access_token = ''
+            self._expiration = int(time.time())
+            print('initial expiration=' + str(self._expiration))
     
         def __call__(self, context, callback):
             print('__call__ context=' + str(context))
-            metadata = (('authorization', 'Bearer {}'.format(self._access_token)),('bluemix-instance', '{}'.format(self._instance_id)),)
-            # print('metadata=' + str(metadata))
+            current = int(time.time())
+            expiration = int(self._expiration) - 60 # set the expiration 60 sec before the actual one
+            print('remaining=' + str(expiration - current) + ' expiration=' + str(expiration) + ' current=' + str(current))
+            if expiration < current:
+                print('renewing an access token')
+                self.get_access_token()
+                valid_for = int(self._expiration) - int(time.time())
+                print('new expiration=' + str(self._expiration) + ' valid for ' + str(valid_for) + ' sec')
+            metadata = (('authorization', 'Bearer {}'.format(self._access_token)),('bluemix-instance', '{}'.format(self._instance)),)
+            #print('metadata=' + str(metadata))
             callback(metadata, None)
 
-    # get or renew an access token
-    def get_access_token(self):
-        print("accessing an HPCS instance on IBM Cloud")
+        def get_access_token(self):
+            print("*** get a new access token for an HPCS instance on IBM Cloud ***")
         
-        print("ZHSM=" + self.zhsm)
-        # print("APIKEY=" + self.apikey)
-        print("INSTANCE_ID=" + self.instance)
-        print("ENDPOINT=" + self.endpoint)
+            # print("APIKEY=" + self._apikey)
+            # print("INSTANCE_ID=" + self._instance)
+            print("ENDPOINT=" + self._endpoint)
     
-        cmd = 'curl -sS -k -X POST --header "Content-Type: application/x-www-form-urlencoded" --header "Accept: application/json" --data-urlencode "grant_type=urn:ibm:params:oauth:grant-type:apikey" --data-urlencode "apikey=' + self.apikey + '" "' + self.endpoint + '/identity/token"'
+            cmd = 'curl -sS -k -X POST --header "Content-Type: application/x-www-form-urlencoded" --header "Accept: application/json" --data-urlencode "grant_type=urn:ibm:params:oauth:grant-type:apikey" --data-urlencode "apikey=' + self._apikey + '" "' + self._endpoint + '/identity/token"'
 
-        try:
-            resp_str = check_output(cmd, shell=True).rstrip().decode('utf8')
-        except Exception as e:
-            print('an unexpected response from IAM_ENDPOINT=' + endpoint)
-            print(e)
-            import traceback
-            traceback.print_exc()
-            return None
+            try:
+                resp_str = check_output(cmd, shell=True).rstrip().decode('utf8')
+            except Exception as e:
+                print('an unexpected response from IAM_ENDPOINT=' + self._endpoint)
+                print(e)
+                import traceback
+                traceback.print_exc()
+                return None
 
-        try:
-            resp = json.loads(resp_str)
-            # print('response=' + json.dumps(resp, indent=4))
-            self.access_token = resp['access_token']
-            print('access_token=' + 'xxxxxxxxxxxxxxxxxxxxxxxxx...')
-            return self.access_token
+            try:
+                resp = json.loads(resp_str)
+                # print('response=' + json.dumps(resp, indent=4))
+                self._expiration = resp['expiration']
+                self._access_token = resp['access_token']
+                print('access_token=' + 'xxxxxxxxxxxxxxxxxxxxxxxxx...')
+                return self._access_token
         
-        except Exception as e:
-            print('an unexpected response from IAM_ENDPOINT=' + endpoint)
-            print('response=' + str(resp_str))
-            print(e)
-            import traceback
-            traceback.print_exc()
-            return None
+            except Exception as e:
+                print('an unexpected response from IAM_ENDPOINT=' + self._endpoint)
+                print('response=' + str(resp_str))
+                print(e)
+                import traceback
+                traceback.print_exc()
+                return None
 
     def get_channel(self):
         if not self.zhsm:
             channel = None
+            print("using a software crypto")
         elif not self.apikey or not self.instance:
-            print("$APIKEY or $INSTANCE_ID environment variable is not set - accessing an on-prem grep11 at " + self.zhsm)
+            print("accessing an on-prem HPCS (grep11) at "  + self.zhsm + " - $APIKEY or $INSTANCE_ID environment variable is not set")
             channel = grpc.insecure_channel(self.zhsm)
         else:
-            print("accessing an HPCS instance on IBM Cloud")
+            print("accessing an HPCS instance on IBM Cloud at " + self.zhsm)
             print("ZHSM=" + self.zhsm)
             # print("APIKEY=" + self.apikey)
             print("INSTANCE_ID=" + self.instance)
             print("ENDPOINT=" + self.endpoint)
 
-            call_credentials = grpc.metadata_call_credentials(self.AuthPlugin(self.instance, self.access_token))
+            call_credentials = grpc.metadata_call_credentials(self.AuthPlugin(self.instance, self.apikey, self.endpoint))
             channel_credential = grpc.ssl_channel_credentials()
             composite_credentials = grpc.composite_channel_credentials(channel_credential, call_credentials)
             channel = grpc.secure_channel(self.zhsm, composite_credentials)
@@ -156,47 +149,35 @@ class AES:
         return ep11key
    
     def encrypt_with_iv(self, key, iv, data):
-        channel = self.get_channel()
-        # no ZHSM
-        if not channel:
+        # return None if there is no ZHSM
+        if not self.channel:
             return None
         
-        grep11ServerStub = server_pb2_grpc.CryptoStub(channel)
+        grep11ServerStub = server_pb2_grpc.CryptoStub(self.channel)
         
         try:
             ep11key = self.ep11key(grep11ServerStub, key)
             print("pyep11.AES.encrypt: key=" + key.hex())
-
-            cipherInitInfo = server_pb2.EncryptInitRequest(Mech=pkcs11_pb2.Mechanism(Mechanism=ep11.CKM_AES_CBC_PAD,
-                                                                                     Parameter=iv),
-                                                           Key = ep11key)
-            cipherState = grep11ServerStub.EncryptInit(cipherInitInfo)
             
-            cipherData = server_pb2.EncryptUpdateRequest(State=cipherState.State,
-                                                         Plain=data)
-            cipherState = grep11ServerStub.EncryptUpdate(cipherData)
-
+            request = server_pb2.EncryptSingleRequest(Mech=pkcs11_pb2.Mechanism(Mechanism=ep11.CKM_AES_CBC_PAD,
+                                                                                Parameter=iv),
+                                                      Key = ep11key,
+                                                      Plain=data)
+            cipherState = grep11ServerStub.EncryptSingle(request)
+            
             ciphertext = cipherState.Ciphered[:]
-            cipherData.State = cipherState.State
-            cipherData.Plain = b''
-            cipherState = grep11ServerStub.EncryptFinal(cipherData)
+            if len(data) < 128:
+                print("Original message  " + str(data))
+            else:
+                print("Original message  " + "..........................")
+            #print("Original message  " + data.hex())
+            #print("Encrypted message " + ciphertext.hex())
 
-            ciphertext = ciphertext + cipherState.Ciphered[:]
-            # print("Original message  " + data.hex())
-            # print("Encrypted message " + ciphertext.hex())
-
-            self.retry = False
-            
             return ciphertext
 
         except grpc.RpcError as rpc_error:
             print(f'encrypt_with_iv: RPC failed with code {rpc_error.code()}: {rpc_error}')
             print('grpc error code=' + str(rpc_error._state.code) + ' ' + str(type(rpc_error._state.code)))
-            # retry once if the access token has expired
-            if str(rpc_error._state.code) == 'StatusCode.UNAUTHENTICATED' and not self.retry:
-                self.get_access_token()
-                self.retry = True
-                return self.encrypt_with_iv(key, iv, data)
             return None
     
         except Exception as e:
@@ -206,47 +187,35 @@ class AES:
             return None
     
     def decrypt_with_iv(self, key, iv, encrypted_data):
-        channel = self.get_channel()
-        # no ZHSM
-        if not channel:
+        # return None if there is no ZHSM
+        if not self.channel:
             return None
         
-        grep11ServerStub = server_pb2_grpc.CryptoStub(channel)
+        grep11ServerStub = server_pb2_grpc.CryptoStub(self.channel)
         
         try:
             ep11key = self.ep11key(grep11ServerStub, key)
             print("pyep11.AES.decrypt: key=" + key.hex())
 
-            cipherInitInfo = server_pb2.DecryptInitRequest(Mech=pkcs11_pb2.Mechanism(Mechanism=ep11.CKM_AES_CBC_PAD,
-                                                                                     Parameter=iv),
-                                                           Key = ep11key)
-            cipherState = grep11ServerStub.DecryptInit(cipherInitInfo)
-            
-            cipherData = server_pb2.DecryptUpdateRequest(State=cipherState.State,
-                                                         Ciphered=encrypted_data)
-            cipherState = grep11ServerStub.DecryptUpdate(cipherData)
+            request = server_pb2.DecryptSingleRequest(Mech=pkcs11_pb2.Mechanism(Mechanism=ep11.CKM_AES_CBC_PAD,
+                                                                                Parameter=iv),
+                                                      Key = ep11key,
+                                                      Ciphered=encrypted_data)
+            cipherState = grep11ServerStub.DecryptSingle(request)
 
             plaintext = cipherState.Plain[:]
-            cipherData.State = cipherState.State
-            cipherData.Ciphered = b''
-            cipherState = grep11ServerStub.DecryptFinal(cipherData)
+            if len(plaintext) < 128:
+                print("Decrypted message  " + str(plaintext))
+            else:
+                print("Decrypted message  " + "..........................")
+            #print("Decrypted message  " + plaintext.hex())
+            #print("Encrypted message  " + encrypted_data.hex())
 
-            plaintext = plaintext + cipherState.Plain[:]
-            # print("Decrypted message  " + plaintext.hex())
-            # print("Encrypted message  " + encrypted_data.hex())
-
-            self.retry = False
-            
             return plaintext
 
         except grpc.RpcError as rpc_error:
             print(f'decrypt_with_iv: RPC failed with code {rpc_error.code()}: {rpc_error}')
             print('grpc error code=' + str(rpc_error._state.code) + ' ' + str(type(rpc_error._state.code)))
-            # retry once if the access token has expired
-            if str(rpc_error._state.code) == 'StatusCode.UNAUTHENTICATED' and not self.retry:
-                self.get_access_token()
-                self.retry = True
-                return self.decrypt_with_iv(key, iv, encrypted_data)
             return None
     
         except Exception as e:
