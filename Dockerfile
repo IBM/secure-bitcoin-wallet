@@ -56,7 +56,7 @@ RUN git clone https://github.com/tnakaike/electrum.git && \
               --python_out=/git/pyep11/generated/python_grpc --grpc_python_out=/git/pyep11/generated/python_grpc; \
        mv /git/pyep11/generated/python_grpc/* /git/electrum; \
        mv /git/pyep11/pyep11.py /git/electrum; \
-       mv /git/pyep11/ep11.py /git/electrum; \
+       mv /git/pyep11/grep11consts.py /git/electrum; \
     fi && \
     mkdir -p /data && chown ${ELECTRUM_USER} /data
 
