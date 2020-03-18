@@ -7,13 +7,11 @@ The backend, a modified version of [Electrum](https://github.com/spesmilo/electr
 The frontend, a modified version of [Electrum for Laravel 5.4+](https://github.com/AraneaDev/laravel-electrum), runs as a Web frontend on [Laravel](https://laravel.com/) to interact with bitcoin users via a Web browser. Laravel hosts an application written in PHP using
 Node.js for the rendering on the client (browser).
 
-These two components are configured to run in a single [IBM Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
+These two components are configured to run in a single [IBM Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server), as illustrated in the following diagram.
 
 It can optionally encrypt/decrypt a wallet file using [IBM Cloud Hyper Protect Crypto Services](https://cloud.ibm.com/catalog/services/hyper-protect-crypto-services) (zHSM) to protect the encryption key. 
 
-Here is a block diagram of this application.
-
-![blockdiagram](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/diagram.png)*Block Diagram*
+![blockdiagram](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/diagram.png)
 
 
 When you have completed this code pattern, you will understand how to:
@@ -29,15 +27,15 @@ The frontend and backend applications can both be run locally, or in
 the IBM Cloud in a Linux VM, for example an [IBM Cloud Hyper Protect
 Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
 
-![HPVS_find](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/SearchHPVS.png)*Hyper Protect Virtual Server*
+![HPVS_find](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/SearchHPVS.png)
+
+![HPVS_create](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/HPVSFields.png)
 
 ### Create your IBM Cloud Hyper Protect Virtual Server Instance
 
 You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-provision).
 
-![HPVS_create](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/HPVSFields.png)**
-
-   * Make sure to copy and paste in the public half of an SSH key. If you don't one already, please follow the guide [here]( https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys).
+Make sure to copy and paste in the public half of an SSH key. If you don't one already, please follow the guide [here]( https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys).
 
 ### Log into your Virtual Server
 
@@ -132,7 +130,7 @@ $ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${
 
 Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
-![A screenshot](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/screenshot.png)*A Screenshot*
+![A screenshot](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/screenshot.png)
 
 ### WARNING: This software is for demonstration purposes only. Use at your own risk.
 
