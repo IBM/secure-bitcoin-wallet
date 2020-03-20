@@ -15,7 +15,9 @@ echo "wallet="$wallet
 
 DOCKER_CONTENT_TRUST=${DOCKER_CONTENT_TRUST:-0}
 
+echo "removing Dcoker container $wallet_vol-wallet"
 docker rm -f $wallet_vol-wallet
+echo "removing Docker volume $wallet_vol"
 docker volume rm $wallet_vol
 
 
