@@ -7,9 +7,7 @@ The backend, a modified version of [Electrum](https://github.com/spesmilo/electr
 The frontend, a modified version of [Electrum for Laravel 5.4+](https://github.com/AraneaDev/laravel-electrum), runs as a Web frontend on [Laravel](https://laravel.com/) to interact with bitcoin users via a Web browser. Laravel hosts an application written in PHP using
 Node.js for the rendering on the client (browser).
 
-These two components are configured to run in a single [IBM Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server), as illustrated in the following diagram.
-
-It can optionally encrypt/decrypt a wallet file using [IBM Cloud Hyper Protect Crypto Services](https://cloud.ibm.com/catalog/services/hyper-protect-crypto-services) (zHSM) to protect the encryption key. 
+These two components are configured to run in a single [IBM Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server), as illustrated in the following diagram. It can optionally encrypt/decrypt a wallet file using [IBM Cloud Hyper Protect Crypto Services](https://cloud.ibm.com/catalog/services/hyper-protect-crypto-services) (zHSM) to protect the encryption key. 
 
 ![blockdiagram](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/diagram.png)
 
@@ -43,7 +41,7 @@ You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virt
 
 ### How to build the Wallet application
 
-Start by installing git and docker. You typically need a root priviledge. If you login as a root, typically you find `#`
+Start by installing git and docker. You typically need a root privilege. If you login as a root, typically you find `#`
 as a command line prompt. You can run the following two commands to install git and docker.io.
 
 ```
@@ -59,7 +57,7 @@ $ sudo apt-get install -y git docker.io
 ```
 
 To build the application, clone the master branch from this repo and build a container out of it.
-If you newly installed docker.io on the VM, and if you want to build a continaer as a regualr user,
+If you newly installed docker.io on the VM, and if you want to build a container as a regular user,
 typically you need to add your userid to the `docker` group. 
 
 ```
@@ -70,7 +68,7 @@ $ docker build -t secure-bitcoin-wallet .
 
 In default, the Dockerfile installs grpc python packages, such as `grpcio-tools`, to access Hyper Protect Crypto Service (HPCS).
 Since this step can take some time and resources (e.g. memory), you can skip it by adding `NO_GRPC_BUILD=1` as a build argument.
-This option allows you to build a container on a small VM, such as a free instane of HPVS, 
+This option allows you to build a container on a small VM, such as a free instance of HPVS, 
 if you are not planning to use HPCS.
 
 ```
