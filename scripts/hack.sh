@@ -1,10 +1,10 @@
 #!/bin/bash
 
 if [ $# == 0 ] ; then
-    user=$USER
+    user=''
     wallet=charile
 elif [ $# == 1 ] ; then
-    user=$USER
+    user=''
     wallet=$1
 elif [ $# == 2 ] ; then
     user=$1

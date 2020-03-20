@@ -1,6 +1,6 @@
 #!/bin/bash
 
-user=${$1:-$USER}
+user=${$1:-}
 
 echo ""
 echo "********** REMOVING WALLETS **********"

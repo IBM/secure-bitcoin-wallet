@@ -21,9 +21,8 @@ When you have completed this code pattern, you will understand how to:
 
 ## Steps
 
-The frontend and backend applications can both be run locally, or in
-the IBM Cloud in a Linux VM, for example an [IBM Cloud Hyper Protect
-Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
+The frontend and backend applications can both be run locally, or on a Linux VM in the IBM Cloud,
+for example an [IBM Cloud Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
 
 ![HPVS_find](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/SearchHPVS.png)
 
@@ -33,7 +32,7 @@ Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-ser
 
 You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virtual-servers?topic=hp-virtual-servers-provision).
 
-Make sure to copy and paste in the public half of an SSH key. If you don't one already, please follow the guide [here]( https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys).
+Make sure to copy and paste in your SSH public key. If you don't have one already, please follow the guide [here]( https://cloud.ibm.com/docs/vpc?topic=vpc-ssh-keys).
 
 ### Log into your Virtual Server
 
@@ -42,7 +41,7 @@ You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virt
 ### How to build the Wallet application
 
 Start by installing git and docker. You typically need a root privilege. If you login as a root, typically you find `#`
-as a command line prompt. You can run the following two commands to install git and docker.io.
+as a command line prompt. You can run the following two commands to install git and docker.
 
 ```
 # apt-get update
@@ -57,7 +56,7 @@ $ sudo apt-get install -y git docker.io
 ```
 
 To build the application, clone the master branch from this repo and build a container out of it.
-If you newly installed docker.io on the VM, and if you want to build a container as a regular user,
+If you newly installed docker on the VM, and if you want to build a container as a regular user,
 typically you need to add your userid to the `docker` group. 
 
 ```
@@ -77,22 +76,23 @@ $ docker build --build-arg NO_GRPC_BUILD=1 -t secure-bitcoin-wallet .
 
 ### How to run the application
 
-The following sequence of commands starts a wallet container.
-The *WALLET_VOLUME* and *PORT* should be a unique wallet volume name and port number, respectively, on the VM. 
+The following sequence of commands starts a wallet container for the Bitcoin `testnet`, where bitcoins don't have
+an actual monetary value.
+If you run multiple wallet instances on the same VM, the *WALLET_NAME* and *PORT* should be unique among wallets
+on the VM. The container uses a Docker volume of *WALLET_NAME* to store a wallet file.
+
 
 ```
 $ WALLET_NAME=<wallet-name> (e.g. alice)
-$ WALLET_USER=<wallet-user-name> (e.g. demo0)
 $ PORT=<external-https-port>
-$ ZHSM=<ep11server-address> (optional)
-$ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -p ${PORT}:443 --name ${WALLET_USER}-${WALLET_NAME}-wallet secure-bitcoin-wallet
+$ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
 Alternatively, you can use the following shell script in the `scripts` directory. The port `443` is used as a default, except for
-a few predefined users (e.g. charlie for 4431, devil for 4432, eddy for 4433)
+a few predefined users (e.g. charlie for 4431, devil for 4432, eddy for 4433). 
 
 ```
-$ ./scripts/run-wallet.sh ${WALLET_USER} ${WALLET_NAME}
+$ ./scripts/run-wallet.sh ${WALLET_NAME}
 ```
 
 ### How to encrypt the wallet with HPCS (optional)
@@ -100,17 +100,17 @@ $ ./scripts/run-wallet.sh ${WALLET_USER} ${WALLET_NAME}
 Optionally, you can use an HPCS instance to encrypt/decrypt a wallet. To use an HPCS on IBM Cloud, you need to supply
 the following four parameters.
 
-- ZHSM: the domain name and the port number of the on-cloud HPCS instance (e.g. ep11.{location}.hs-crypto.cloud.ibm.com:1234)
+- ZHSM: the domain name and the port number of the HPCS instance (e.g. ep11.{location}.hs-crypto.cloud.ibm.com:1234)
 - APIKEY: the api key for the HPCS instance (e.g. xxxxxxx-xxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)
 - INSTANCE_ID: the instance id of the HPCS instance (e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
-- IAM_ENDPOINT: the URL for an IAM endpoint (this is optional. a default value, https://iam.cloud.ibm.com, is used if not specified)
+- IAM_ENDPOINT: the URL of an IAM endpoint (this is optional. a default value, https://iam.cloud.ibm.com, is used if not specified)
 
 If `ZHSM` is not defined, a default software AES is used.
 If `ZHSM` is defined but `APIKEY` or `INSTANCE_ID` is not, we assume the HPCS instance doesn't require authentication
 (typical for an on-prem instance).
 
 ```
-$ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY=${APIKEY} -e INSTANCE_ID=${INSTANCE_ID} --name ${WALLET_USER}-${WALLET_NAME}-wallet secure-bitcoin-wallet
+$ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY=${APIKEY} -e INSTANCE_ID=${INSTANCE_ID} --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
 ### Use a Web browser to access the electrum wallet.
@@ -120,7 +120,7 @@ $ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${
 - Accept a warning on a browser to use a self-signed certificate.
 - Click "register" to register name, e-mail address, and password, for the first time. Or click "login" if already registered.
 - Access https://hostname:port/electrum again if not redirected automatically.
-- Create and load a wallet from a Wallet tab.
+- Create and load a wallet from a Wallet tab. Leave the seed field empty unless you want to use a seed from a previously created wallet.
 - Reload the browser.
 - Select one of three tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign`) to interact with the wallet.
 
@@ -137,19 +137,20 @@ Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
 1. Persistent data
 
-Wallet files are stored in a Docker volume, which can be examined by the following command, as the volume name
-consists of ${WALLET_USER} and ${WALLET_NAME} in the instruction shown above.
+A wallet files is stored in a Docker volume, which can be examined by the following command, as the volume name
+is ${WALLET_NAME} when a wallet container is created as described above.
 
 ```
-$ docker volume inspect ${WALLET_USER}-${WALLET_NAME}
+$ docker volume inspect ${WALLET_NAME}
 ```
 
 2. Reloading an existing wallet
 
-To load a previously created wallet with a password in a docker volume, run the following command to create a wallet container
+To load a previously created wallet with a password in a docker volume, run the following command to create a wallet container.
+Replace [wallet-password] with your wallet password.
 
 ```
-$ docker run -d -v ${WALLET_USER}-${WALLET_NAME}:/data -e WALLET=/data/electrum/testnet/wallets/default_wallet -e PASSWORD={wallet-password} -p ${PORT}:443 -e ZHSM=${ZHSM} --name ${WALLET_USER}-${WALLET_NAME}-wallet secure-bitcoin-wallet
+$ docker run -d -v ${WALLET_NAME}:/data -e WALLET=/data/electrum/testnet/wallets/default_wallet -e PASSWORD=[wallet-password] -p ${PORT}:443 --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
 ## License

@@ -1,11 +1,12 @@
 #!/bin/bash
 
 if [ $# == 1 ] ; then
-    user=$USER
     wallet=$1
+    wallet_vol=$wallet
 elif [ $# == 2 ] ; then
     user=$1
     wallet=$2
+    wallet_vol=$user-$wallet
 else
     echo "usage: "$0" [username] walletname (e.g. demo0 charlie)"
     exit
@@ -30,5 +31,5 @@ else
 fi
 
 echo $portmap
-docker run -d -v $user-$wallet:/data -p ${portmap} --name $user-$wallet-wallet $CONTAINER_IMAGE
+docker run -d -v $wallet_vol:/data -p ${portmap} --name $wallet_vol-wallet $CONTAINER_IMAGE
 
