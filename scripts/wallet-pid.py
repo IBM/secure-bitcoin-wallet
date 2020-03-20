@@ -5,6 +5,11 @@ import os
 import platform
 from subprocess import check_output
 
+system = platform.system()    
+if system != 'Linux':
+    print('This script works only on Linux.')
+    sys.exit(0)
+
 if len(sys.argv) == 3:
     username = sys.argv[1]
     walletname = sys.argv[2]

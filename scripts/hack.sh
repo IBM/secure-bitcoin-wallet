@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if [ $(uname) != "Linux" ] ; then
+    echo "this script works only on Linux"
+    exit
+fi
+
 if [ $# == 0 ] ; then
     user=''
     wallet=charile
