@@ -26,10 +26,11 @@ port=${!port}
 
 if [ ${port} ]; then
     portmap=$port:443
+    echo "port mapping is $portmap"
 else
     portmap=443
+    echo "the default port 443 is used"
 fi
 
-echo $portmap
 docker run -d -v $wallet_vol:/data -p ${portmap} --name $wallet_vol-wallet $CONTAINER_IMAGE
 

@@ -89,7 +89,7 @@ $ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 --name ${WALLET_NAME}-wal
 ```
 
 Alternatively, you can use the following shell script in the `scripts` directory. The port `443` is used as a default, except for
-a few predefined users (e.g. charlie for 4431, devil for 4432, eddy for 4433). 
+a few predefined wallet names (e.g. charlie for 4431, devil for 4432, eddy for 4433). 
 
 ```
 $ ./scripts/run-wallet.sh ${WALLET_NAME}
@@ -115,16 +115,14 @@ $ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY
 
 ### Use a Web browser to access the electrum wallet.
 
-```
 - Access https://hostname:port/electrum from a browser with the port number specified for the container.
 - Accept a warning on a browser to use a self-signed certificate.
 - Click "register" to register name, e-mail address, and password, for the first time. Or click "login" if already registered.
 - Access https://hostname:port/electrum again if not redirected automatically.
-- Create and load a wallet from a Wallet tab. Leave the seed field empty unless you want to use a seed from a previously created wallet.
+- Create and load a wallet from a Wallet tab. Leave the seed field empty unless you want to use a seed from a previously created wallet. You can set a wallet password here. Note that it is different from the login password.
 - Reload the browser.
 - Select one of three tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign`) to interact with the wallet.
 
-```
 
 Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
@@ -137,7 +135,7 @@ Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
 1. Persistent data
 
-A wallet files is stored in a Docker volume, which can be examined by the following command, as the volume name
+A wallet file is stored in a Docker volume, which can be examined by the following command, as the volume name
 is ${WALLET_NAME} when a wallet container is created as described above.
 
 ```
