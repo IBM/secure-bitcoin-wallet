@@ -88,11 +88,13 @@ $ PORT=<external-https-port>
 $ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
-Alternatively, you can use the following shell script in the `scripts` directory. The port `443` is used as a default, except for
-a few predefined wallet names (e.g. charlie for 4431, devil for 4432, eddy for 4433). 
+Alternatively, you can use the following shell script in the `scripts` directory. The Docker selects an unused port as a default,
+except for a few predefined wallet names (e.g. charlie for 4431, devil for 4432, eddy for 4433). The script prints the port
+number assgined to the wallet if a container is created successfully.
 
 ```
 $ ./scripts/run-wallet.sh ${WALLET_NAME}
+a wallet is running in container ${WALLET_NAME}-wallet at port xxxxx
 ```
 
 ### How to encrypt the wallet with HPCS (optional)
@@ -121,7 +123,7 @@ $ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY
 - Access https://hostname:port/electrum again if not redirected automatically.
 - Create and load a wallet from a Wallet tab. Leave the seed field empty unless you want to use a seed from a previously created wallet. You can set a wallet password here. Note that it is different from the login password.
 - Reload the browser.
-- Select one of three tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign`) to interact with the wallet.
+- Select one of five tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign`) to interact with the wallet.
 
 
 Here is a sample screenshot of the wallet to send bitcoins to a recipient.
