@@ -7,7 +7,7 @@ fi
 
 if [ $# == 0 ] ; then
     user=''
-    wallet=charile
+    wallet=charlie
 elif [ $# == 1 ] ; then
     user=''
     wallet=$1

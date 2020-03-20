@@ -56,6 +56,8 @@ else:
     except:
         print("wallet address not found " + sys.exc_info()[0])
         sys.exit(-1)
+    addresses = address.split(',')
+    address = addresses[0]
 
 print("wallet container: " + wallet + " url: https://" + address + ":" + port + "/register")
 
