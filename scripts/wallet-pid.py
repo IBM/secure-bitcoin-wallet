@@ -5,13 +5,18 @@ import os
 import platform
 from subprocess import check_output
 
+system = platform.system()    
+if system != 'Linux':
+    print('This script works only on Linux.')
+    sys.exit(0)
+
 if len(sys.argv) == 3:
     username = sys.argv[1]
     walletname = sys.argv[2]
     wallet = username + "-" + walletname + "-wallet"
 elif len(sys.argv) == 2:
     walletname = sys.argv[1]
-    wallet = os.environ['USER'] + "-" + walletname + "-wallet"
+    wallet = walletname + "-wallet"
 else:    
     print(sys.argv[0] + " [username] walletname")
     print(sys.argv[0] + " -h | --help")

@@ -1,10 +1,15 @@
 #!/bin/bash
 
+if [ $(uname) != "Linux" ] ; then
+    echo "this script works only on Linux"
+    exit
+fi
+
 if [ $# == 0 ] ; then
-    user=$USER
-    wallet=charile
+    user=''
+    wallet=charlie
 elif [ $# == 1 ] ; then
-    user=$USER
+    user=''
     wallet=$1
 elif [ $# == 2 ] ; then
     user=$1
