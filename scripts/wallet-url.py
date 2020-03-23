@@ -13,9 +13,9 @@ if len(sys.argv) == 3:
     wallet = username + "-" + walletname + "-wallet"
 elif len(sys.argv) == 2:
     walletname = sys.argv[1]
-    wallet = os.environ['USER'] + "-" + walletname + "-wallet"
+    wallet = walletname + "-wallet"
 else:    
-    print(sys.argv[0] + " [username] alletname")
+    print(sys.argv[0] + " [username] walletname")
     sys.exit(0)
 
 cmd = "docker inspect --format='{{(index (index .NetworkSettings.Ports \"443/tcp\") 0).HostPort}}' " + wallet
@@ -27,22 +27,37 @@ except:
 
 #print("port: " + port)
 
-cmd = "hostname -I"
-try:
-    address = check_output(cmd, shell=True).rstrip().decode('utf8').split()[0]
-except:
-    print("wallet address not found " + sys.exc_info()[0])
-    sys.exit(-1)
-
-pattern = "^172\."
-
-if re.search(pattern,address):
-    cmd = "curl -s http://169.254.169.254/latest/meta-data/public-ipv4"
+if os.environ.get('USE_HOSTNAME'):
+    cmd = "hostname -f"
+    try:
+        address = check_output(cmd, shell=True).rstrip().decode('utf8').split()[0]
+    except:
+        print("wallet address not found " + sys.exc_info()[0])
+        sys.exit(-1)
+elif os.environ.get('USE_AWS_METADATA'):    
+    cmd = "hostname -I"
+    try:
+        address = check_output(cmd, shell=True).rstrip().decode('utf8').split()[0]
+    except:
+        print("wallet address not found " + sys.exc_info()[0])
+        sys.exit(-1)
+    pattern = "^172\."
+    if re.search(pattern,address):
+        cmd = "curl -s http://169.254.169.254/latest/meta-data/public-ipv4"
+        try:
+            address = check_output(cmd, shell=True).rstrip().decode('utf8')
+        except:
+            print("wallet address not found " + sys.exc_info()[0])
+            sys.exit(-1)
+else:
+    cmd = "curl -s http://inet-ip.info/ip"
     try:
         address = check_output(cmd, shell=True).rstrip().decode('utf8')
     except:
         print("wallet address not found " + sys.exc_info()[0])
         sys.exit(-1)
+    addresses = address.split(',')
+    address = addresses[0]
 
 print("wallet container: " + wallet + " url: https://" + address + ":" + port + "/register")
 
