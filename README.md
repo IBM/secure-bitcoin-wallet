@@ -9,7 +9,7 @@ Node.js for the rendering on the client (browser).
 
 These two components are configured to run in a single [IBM Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server), as illustrated in the following diagram. It can optionally encrypt/decrypt a wallet file using [IBM Cloud Hyper Protect Crypto Services](https://cloud.ibm.com/catalog/services/hyper-protect-crypto-services) (zHSM) to protect the encryption key. 
 
-![blockdiagram](images/images/diagram.png)
+![blockdiagram](images/diagram.png)
 
 When you have completed this code pattern, you will understand how to:
 
@@ -23,9 +23,9 @@ When you have completed this code pattern, you will understand how to:
 The frontend and backend applications can both be run locally, or on a Linux VM in the IBM Cloud,
 for example an [IBM Cloud Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server).
 
-![HPVS_find](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/SearchHPVS.png)
+![HPVS_find](images/SearchHPVS.png)
 
-![HPVS_create](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/HPVSFields.png)
+![HPVS_create](images/HPVSFields.png)
 
 ### Create your IBM Cloud Hyper Protect Virtual Server Instance
 
@@ -121,7 +121,7 @@ $ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY
 
 Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
-![A screenshot](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/screenshot.png)
+![A screenshot](images/screenshot.png)
 
 ### WARNING: This software is for demonstration purposes only. Use at your own risk.
 
