@@ -1,6 +1,6 @@
 # Bitcoin Digital Wallet
 
-In this code pattern, we will deploy a Digital Wallet application in the public cloud. As digital wallets are targeted by hackers, it is important that the digital assets be protected in an environment that is also easily accessible by the user - also known as a "hot wallet". This includes having an environment where privileged admins nor external threats can compromise the data, via encryption and other mechanisms.
+In this code pattern, we will deploy a Digital Wallet application in the public cloud. As digital wallets are targeted by hackers, it is important that the digital assets be protected in an environment that is also easily accessible by the user - also known as a "hot wallet". This includes having an environment where neither privileged admins nor external threats can compromise the data, via encryption and other mechanisms.
 
 The Digital Wallet application consists of an Electrum Bitcoin Client backend and a Web frontend.
 The backend, a modified version of [Electrum](https://github.com/spesmilo/electrum), runs as a JSON RPC server to maintain a bitcoin wallet by interacting with the bitcoin network. 
@@ -9,12 +9,11 @@ Node.js for the rendering on the client (browser).
 
 These two components are configured to run in a single [IBM Hyper Protect Virtual Server](https://cloud.ibm.com/catalog/services/hyper-protect-virtual-server), as illustrated in the following diagram. It can optionally encrypt/decrypt a wallet file using [IBM Cloud Hyper Protect Crypto Services](https://cloud.ibm.com/catalog/services/hyper-protect-crypto-services) (zHSM) to protect the encryption key. 
 
-![blockdiagram](https://github.com/IBM/secure-bitcoin-wallet/blob/images/images/diagram.png)
-
+![blockdiagram](images/images/diagram.png)
 
 When you have completed this code pattern, you will understand how to:
 
-* Build and run a Electrum Bitcoin Digital Wallet application 
+* Build and run an Electrum Bitcoin Digital Wallet application 
 * Stand up an IBM Cloud Hyper Protect Virtual Server
 * (Optional) Integrate with IBM Cloud Hyper Protect Crypto Services to encrypt the wallet
 
@@ -40,8 +39,8 @@ You can find the instructions [here](https://cloud.ibm.com/docs/services/hp-virt
 
 ### How to build the Wallet application
 
-Start by installing git and docker. You typically need a root privilege. If you login as a root, typically you find `#`
-as a command line prompt. You can run the following two commands to install git and docker.
+Start by installing Git and Docker. You typically need a root privilege. If you login as a root, typically you find `#`
+as a command line prompt. You can run the following two commands to install Git and Docker.
 
 ```
 # apt-get update
@@ -56,7 +55,7 @@ $ sudo apt-get install -y git docker.io
 ```
 
 To build the application, clone the master branch from this repo and build a container out of it.
-If you newly installed docker on the VM, and if you want to build a container as a regular user,
+If you just installed Docker in the VM, and if you want to build a container as a regular user,
 typically you need to add your userid to the `docker` group. 
 
 ```
@@ -65,7 +64,7 @@ $ cd secure-bitcoin-wallet
 $ docker build -t secure-bitcoin-wallet .
 ```
 
-In default, the Dockerfile installs grpc python packages, such as `grpcio-tools`, to access Hyper Protect Crypto Service (HPCS).
+By default, the Dockerfile installs grpc python packages, such as `grpcio-tools`, to access IBM Cloud Hyper Protect Crypto Services (HPCS).
 Since this step can take some time and resources (e.g. memory), you can skip it by adding `NO_GRPC_BUILD=1` as a build argument.
 This option allows you to build a container on a small VM, such as a free instance of HPVS, 
 if you are not planning to use HPCS.
@@ -76,10 +75,8 @@ $ docker build --build-arg NO_GRPC_BUILD=1 -t secure-bitcoin-wallet .
 
 ### How to run the application
 
-The following sequence of commands starts a wallet container for the Bitcoin `testnet`, where bitcoins don't have
-an actual monetary value.
-If you run multiple wallet instances on the same VM, the *WALLET_NAME* and *PORT* should be unique among wallets
-on the VM. The container uses a Docker volume of *WALLET_NAME* to store a wallet file.
+The following sequence of commands starts a wallet container for the Bitcoin `testnet`, where bitcoins don't have an actual monetary value.
+If you run multiple wallet instances on the same VM, the *WALLET_NAME* and *PORT* should be unique among wallets in the VM. The container uses a Docker volume of *WALLET_NAME* to store a wallet file.
 
 
 ```
@@ -88,9 +85,7 @@ $ PORT=<external-https-port>
 $ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
-Alternatively, you can use the following shell script in the `scripts` directory. The Docker selects an unused port as a default,
-except for a few predefined wallet names (e.g. charlie for 4431, devil for 4432, eddy for 4433). The script prints the port
-number assgined to the wallet if a container is created successfully.
+Alternatively, you can use the following shell script in the `scripts` directory. Docker selects an unused port as a default, except for a few predefined wallet names (e.g. charlie for 4431, devil for 4432, eddy for 4433). The script prints the port number assgined to the wallet if a container is created successfully.
 
 ```
 $ ./scripts/run-wallet.sh ${WALLET_NAME}
@@ -99,8 +94,7 @@ a wallet is running in container ${WALLET_NAME}-wallet at port xxxxx
 
 ### How to encrypt the wallet with HPCS (optional)
 
-Optionally, you can use an HPCS instance to encrypt/decrypt a wallet. To use an HPCS on IBM Cloud, you need to supply
-the following four parameters.
+Optionally, you can use an HPCS instance to encrypt/decrypt a wallet. To use an HPCS on IBM Cloud, you need to supply the following four parameters.
 
 - ZHSM: the domain name and the port number of the HPCS instance (e.g. ep11.{location}.hs-crypto.cloud.ibm.com:1234)
 - APIKEY: the api key for the HPCS instance (e.g. xxxxxxx-xxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)
@@ -124,7 +118,6 @@ $ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY
 - Create and load a wallet from a Wallet tab. Leave the seed field empty unless you want to use a seed from a previously created wallet. You can set a wallet password here. Note that it is different from the login password.
 - Reload the browser.
 - Select one of five tabs (`History`, `Requests`, `Receive`, `Send`, or `Sign`) to interact with the wallet.
-
 
 Here is a sample screenshot of the wallet to send bitcoins to a recipient.
 
