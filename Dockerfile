@@ -15,7 +15,7 @@
 ##############################################################################
 FROM node:10.16.0-stretch-slim AS node
 
-FROM python:3.7-slim-stretch
+FROM python:3.7-slim
 
 COPY --from=node /usr/local /usr/local
 
