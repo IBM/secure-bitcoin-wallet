@@ -27,7 +27,7 @@ RUN apt-get update && \
 # install python and other additional packages
     apt-get install -y --no-install-recommends ca-certificates curl && \
     apt-get install -y --no-install-recommends git python3-pip python3-dev build-essential python3-setuptools python3-wheel protobuf-compiler libssl-dev libffi-dev autoconf automake libtool && \
-    apt-get install -y --no-install-recommends php apache2 xz-utils libedit2 vim && \
+    apt-get install -y --no-install-recommends php php-curl apache2 xz-utils libedit2 vim && \
     apt-get install -y --no-install-recommends sqlite3 libsqlite3-dev libpng-dev libzip-dev python php-zip && \
     apt-get install -y --no-install-recommends php-mbstring php-xml php-sqlite3 unzip && \
     apt-get install -y --no-install-recommends supervisor && \
@@ -95,49 +95,45 @@ RUN curl -sS https://getcomposer.org/installer -o composer-setup.php && \
     git clone https://github.com/laravel/laravel.git && \
     mv laravel electrum && \
     cd $APP_ROOT && \
-    git checkout v5.4.30
+    git checkout 6.x
 
 ###################################################################################
 # Install Laravel-Electrum, a web frontend for Electrum
-
 ENV APP_ROOT /var/www/html/electrum
 
 WORKDIR $APP_ROOT
 
-ADD laravel-electrum/composer.json composer.json
+ADD laravel-electrum/composer.json .
 ADD laravel-electrum/env.sh .
+ADD laravel-electrum/api.php laravel-electrum/web.php /var/www/html/electrum/routes/
 
-RUN chown -R www-data /var/www
-USER www-data
+ARG LARAVEL_ELECTRUM_BRANCH="local-d"
 
-ARG LARAVEL_ELECTRUM_BRANCH="local-c"
+# Use ACCESS_TOKEN to access github with credential when necessary
+# ARG ACCESS_TOKEN
 RUN sed --in-place "s|dev-local|dev-${LARAVEL_ELECTRUM_BRANCH}|" composer.json && \
+#   composer config --global github-oauth.github.com ${ACCESS_TOKEN} && \
     composer -vv install && \
+    php artisan ui vue --auth && \
     npm install && \
     mv .env.example .env && \
     php artisan key:generate && \
     ./env.sh && \
-    php artisan make:auth && \
     php artisan make:migration create_user && \
     sed --in-place "s|App\\\Providers\\\RouteServiceProvider::class,|App\\\Providers\\\RouteServiceProvider::class,\n        AraneaDev\\\Electrum\\\ElectrumServiceProvider::class,|" config/app.php && \
-    sed --in-place "s|Vue.component('example', require('./components/Example.vue'));|Vue.component('electrum-wallet', require('$APP_ROOT/vendor/araneadev/laravel-electrum/src/resources/assets/js/Electrum.vue'));|" $APP_ROOT/resources/assets/js/app.js && \
-    sed --in-place "s/right/left/" resources/views/layouts/app.blade.php && \
-    sed --in-place "s/\"nav navbar-nav\"/\"nav navbar-nav navbar-center\"/" resources/views/layouts/app.blade.php && \
-# Change the redict root after login from home to electrum
-    sed --in-place "s|/home|/electrum|" app/Http/Controllers/Auth/LoginController.php && \
-    sed --in-place "s|/home|/electrum|" app/Http/Controllers/Auth/RegisterController.php && \
-    sed --in-place "s|/home|/electrum|" app/Http/Controllers/Auth/ResetPasswordController.php && \
-# Use the container hostname as the session key
-    sed --in-place "s|'laravel_session',|env('HOSTNAME', 'laravel_session'),|" config/session.php && \
+    sed --in-place "s|Vue.component('example-component', require('./components/ExampleComponent.vue').default);|Vue.component('electrum-wallet', require('$APP_ROOT/vendor/araneadev/laravel-electrum/src/resources/assets/js/Electrum.vue').default);|" $APP_ROOT/resources/js/app.js && \
+    sed --in-place "s|/home|/electrum|" app/Providers/RouteServiceProvider.php && \
     npm install ajv && \
     npm install clipboard --save-dev && \
     npm install moment --save-dev && \
     npm install vue2-bootstrap-modal --save-dev && \
     npm install vue-qrcode-component --save-dev && \
     npm install --save-dev prettier@1.12.0 && \
+    npm install bootstrap-vue --save-dev && \
     npm run dev && \
     composer -vv clearcache && \
-    npm cache clear --force 
+    npm cache clear --force && \
+    php artisan optimize
 
 ARG ELECTRUM_DAEMON_HOST=localhost
 ARG ELECTRUM_DAEMON_USER=electrum
@@ -145,6 +141,8 @@ ARG ELECTRUM_DAEMON_PASSWORD=passw0rd
 RUN echo ELECTRUM_DAEMON_HOST=${ELECTRUM_DAEMON_HOST} >> .env && \
     echo ELECTRUM_DAEMON_USER=${ELECTRUM_DAEMON_USER} >> .env && \
     echo ELECTRUM_DAEMON_PASSWORD=${ELECTRUM_DAEMON_PASSWORD} >> .env
+
+RUN chown -R www-data /var/www
 
 # set up apache
 WORKDIR /etc/apache2/sites-available
@@ -162,7 +160,6 @@ VOLUME /data
 EXPOSE 443
 
 # Setup Supervisord
-USER root
 ADD supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 ENV PYTHONUNBUFFERED=1
 

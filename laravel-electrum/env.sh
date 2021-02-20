@@ -44,9 +44,9 @@ cp .env .env.orig
 sed --in-place s/DB_CONNECTION=mysql/DB_CONNECTION=sqlite/ .env
 sed --in-place s/DB_HOST=127.0.0.1/\#DB_HOST=127.0.0.1/ .env
 sed --in-place s/DB_PORT=3306/\#DB_PORT=3306/ .env
-sed --in-place "s|DB_DATABASE=homestead|DB_DATABASE=$APP_ROOT/database/development.sqlite3|" .env
-sed --in-place s/DB_USERNAME=homestead/\#DB_USERNAME=homestead/ .env
-sed --in-place s/DB_PASSWORD=secret/\#DB_PASSWORD=secret/ .env
+sed --in-place "s|DB_DATABASE=laravel|DB_DATABASE=$APP_ROOT/database/database.sqlite|" .env
+sed --in-place s/DB_USERNAME=root/\#DB_USERNAME=root/ .env
+sed --in-place s/DB_PASSWORD=/\#DB_PASSWORD=secret/ .env
 sed --in-place "s|APP_NAME=Laravel|APP_NAME=\"${TITLE}\"|" .env
 
 diff .env .env.orig
