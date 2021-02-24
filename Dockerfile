@@ -13,7 +13,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 ##############################################################################
-FROM node:10.16.0-stretch-slim AS node
+FROM node:12.14.1-stretch-slim AS node
 
 FROM python:3.7-slim
 
@@ -95,7 +95,7 @@ RUN curl -sS https://getcomposer.org/installer -o composer-setup.php && \
     git clone https://github.com/laravel/laravel.git && \
     mv laravel electrum && \
     cd $APP_ROOT && \
-    git checkout 6.x
+    git checkout 8.x
 
 ###################################################################################
 # Install Laravel-Electrum, a web frontend for Electrum
@@ -107,7 +107,7 @@ ADD laravel-electrum/composer.json .
 ADD laravel-electrum/env.sh .
 ADD laravel-electrum/api.php laravel-electrum/web.php /var/www/html/electrum/routes/
 
-ARG LARAVEL_ELECTRUM_BRANCH="local-d"
+ARG LARAVEL_ELECTRUM_BRANCH="local-e"
 
 # Use ACCESS_TOKEN to access github with credential when necessary
 # ARG ACCESS_TOKEN
@@ -130,6 +130,7 @@ RUN sed --in-place "s|dev-local|dev-${LARAVEL_ELECTRUM_BRANCH}|" composer.json &
     npm install vue-qrcode-component --save-dev && \
     npm install --save-dev prettier@1.12.0 && \
     npm install bootstrap-vue --save-dev && \
+    npm run dev && \
     npm run dev && \
     composer -vv clearcache && \
     npm cache clear --force && \
