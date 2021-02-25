@@ -16,14 +16,18 @@
 ##############################################################################
 
 DB_VOLUME="/data"
-rm $APP_ROOT/database/development.sqlite3
-touch $DB_VOLUME/development.sqlite3
-ln -s $DB_VOLUME/development.sqlite3 $APP_ROOT/database
-chmod 777 $DB_VOLUME/development.sqlite3
+rm $APP_ROOT/database/database.sqlite
+touch $DB_VOLUME/database.sqlite
+ln -s $DB_VOLUME/database.sqlite $APP_ROOT/database
+chmod 777 $DB_VOLUME/database.sqlite
 chmod 777 $DB_VOLUME
 
-php artisan migrate
-php artisan vendor:publish --provider=AraneaDev\Electrum\ElectrumServiceProvider
+php artisan migrate --force --database=sqlite --verbose
+composer update
+php artisan vendor:publish --provider="AraneaDev\Electrum\ElectrumServiceProvider" --verbose
+
+touch $APP_ROOT/storage/logs/laravel.log
+chmod a+w $APP_ROOT/storage/logs/laravel.log
 
 host=`hostname`
 
@@ -60,5 +64,3 @@ service apache2 start
 while true; do
   tail -f /dev/null & wait ${!}
 done
-
-
