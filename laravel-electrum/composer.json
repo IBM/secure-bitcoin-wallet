@@ -5,7 +5,7 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": "^7.2",
+        "php": "^7.3",
         "araneadev/laravel-electrum": "dev-local",
         "laravel/framework": "^6.20.14",
         "laravel/tinker": "^2.0",
