@@ -56,12 +56,16 @@ $ sudo apt-get install -y git docker.io
 
 To build the application, clone the master branch from this repo and build a container out of it.
 If you just installed Docker in the VM, and if you want to build a container as a regular user,
-typically you need to add your userid to the `docker` group. 
+typically you need to add your userid to the `docker` group.
+
+The build process uses a personal access token for github.com to avoid a build failure due to its access rate limit.
+Refer to [an instruction](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) to create one.
+Store your access token into `ACCESS_TOKEN` environment variable.
 
 ```
 $ git clone https://github.com/IBM/secure-bitcoin-wallet.git
 $ cd secure-bitcoin-wallet
-$ docker build -t secure-bitcoin-wallet .
+$ docker build --build-arg ACCESS_TOKEN=${ACCESS_TOKEN} -t secure-bitcoin-wallet .
 ```
 
 By default, the Dockerfile installs grpc python packages, such as `grpcio-tools`, to access IBM Cloud Hyper Protect Crypto Services (HPCS).
@@ -70,7 +74,7 @@ This option allows you to build a container on a small VM, such as a free instan
 if you are not planning to use HPCS.
 
 ```
-$ docker build --build-arg NO_GRPC_BUILD=1 -t secure-bitcoin-wallet .
+$ docker build --build-arg NO_GRPC_BUILD=1 --build-arg ACCESS_TOKEN=${ACCESS_TOKEN} -t secure-bitcoin-wallet .
 ```
 
 ### How to run the application

@@ -13,9 +13,9 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 ##############################################################################
-FROM node:10.16.0-stretch-slim AS node
+FROM node:16-buster-slim AS node
 
-FROM python:3.7-slim
+FROM python:slim-buster
 
 COPY --from=node /usr/local /usr/local
 
@@ -24,6 +24,7 @@ ARG GRPC_PYTHON_BUILD_SYSTEM_OPENSSL=1
 ARG NO_GRPC_BUILD
 
 RUN apt-get update && \
+    apt-get upgrade -y && \
 # install python and other additional packages
     apt-get install -y --no-install-recommends ca-certificates curl && \
     apt-get install -y --no-install-recommends git python3-pip python3-dev build-essential python3-setuptools python3-wheel protobuf-compiler libssl-dev libffi-dev autoconf automake libtool && \
@@ -110,9 +111,10 @@ ADD laravel-electrum/api.php laravel-electrum/web.php /var/www/html/electrum/rou
 ARG LARAVEL_ELECTRUM_BRANCH="local-d"
 
 # Use ACCESS_TOKEN to access github with credential when necessary
-# ARG ACCESS_TOKEN
+ARG ACCESS_TOKEN
+ENV COMPOSER_TOKEN=${ACCESS_TOKEN}}
 RUN sed --in-place "s|dev-local|dev-${LARAVEL_ELECTRUM_BRANCH}|" composer.json && \
-#   composer config --global github-oauth.github.com ${ACCESS_TOKEN} && \
+    composer config --global github-oauth.github.com ${ACCESS_TOKEN} && \
     composer -vv install && \
     php artisan ui vue --auth && \
     npm install && \
