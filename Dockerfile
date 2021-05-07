@@ -39,6 +39,7 @@ RUN apt-get update && \
 ###################################################################################
 
 ARG ELECTRUM_TAG="local-3.3.6-hpcs"
+ARG ELECTRUM_COMMIT="9529b418e26430d577151e460435de0cd445fb7e"
 
 ENV NETWORK "--testnet"
 # ENV ELECTRUM_USER electrum
@@ -51,11 +52,14 @@ ENV ELECTRUM_DIR /git/electrum
 # Add user electrum
 # RUN adduser --home $ELECTRUM_HOME --uid 2000 --disabled-password --disabled-login $ELECTRUM_USER
 
+ARG GHE_ACCESS_TOKEN
 WORKDIR /git
 ADD pyep11 /git/pyep11
-RUN git clone https://github.com/tnakaike/electrum.git && \
+ADD electrum/${ELECTRUM_TAG}.patch .
+RUN git clone https://github.com/spesmilo/electrum.git && \
     cd /git/electrum && \
-    git checkout ${ELECTRUM_TAG} && \
+    git checkout ${ELECTRUM_COMMIT} && \
+    git apply ../${ELECTRUM_TAG}.patch && \
     pip3 uninstall -y enum34 && \
     pip3 install . && \
     protoc --proto_path=electrum --python_out=electrum electrum/paymentrequest.proto && \
@@ -96,7 +100,7 @@ RUN curl -sS https://getcomposer.org/installer -o composer-setup.php && \
     git clone https://github.com/laravel/laravel.git && \
     mv laravel electrum && \
     cd $APP_ROOT && \
-    git checkout 6.x
+    git checkout 8.x
 
 ###################################################################################
 # Install Laravel-Electrum, a web frontend for Electrum
@@ -108,11 +112,10 @@ ADD laravel-electrum/composer.json .
 ADD laravel-electrum/env.sh .
 ADD laravel-electrum/api.php laravel-electrum/web.php /var/www/html/electrum/routes/
 
-ARG LARAVEL_ELECTRUM_BRANCH="local-d"
+ARG LARAVEL_ELECTRUM_BRANCH="local-e" 
 
 # Use ACCESS_TOKEN to access github with credential when necessary
 ARG ACCESS_TOKEN
-ENV COMPOSER_TOKEN=${ACCESS_TOKEN}}
 RUN sed --in-place "s|dev-local|dev-${LARAVEL_ELECTRUM_BRANCH}|" composer.json && \
     composer config --global github-oauth.github.com ${ACCESS_TOKEN} && \
     composer -vv install && \
@@ -124,6 +127,7 @@ RUN sed --in-place "s|dev-local|dev-${LARAVEL_ELECTRUM_BRANCH}|" composer.json &
     php artisan make:migration create_user && \
     sed --in-place "s|App\\\Providers\\\RouteServiceProvider::class,|App\\\Providers\\\RouteServiceProvider::class,\n        AraneaDev\\\Electrum\\\ElectrumServiceProvider::class,|" config/app.php && \
     sed --in-place "s|Vue.component('example-component', require('./components/ExampleComponent.vue').default);|Vue.component('electrum-wallet', require('$APP_ROOT/vendor/araneadev/laravel-electrum/src/resources/assets/js/Electrum.vue').default);|" $APP_ROOT/resources/js/app.js && \
+    sed --in-place "s|'Your wallet created! Please load your wallet after recording your seed.'|response.data.msg|" vendor/araneadev/laravel-electrum/src/resources/assets/js/Electrum.vue && \
     sed --in-place "s|/home|/electrum|" app/Providers/RouteServiceProvider.php && \
     npm install ajv && \
     npm install clipboard --save-dev && \
@@ -132,6 +136,7 @@ RUN sed --in-place "s|dev-local|dev-${LARAVEL_ELECTRUM_BRANCH}|" composer.json &
     npm install vue-qrcode-component --save-dev && \
     npm install --save-dev prettier@1.12.0 && \
     npm install bootstrap-vue --save-dev && \
+    npm install vue-loader@^15.9.5 --save-dev --legacy-peer-deps && \
     npm run dev && \
     composer -vv clearcache && \
     npm cache clear --force && \
