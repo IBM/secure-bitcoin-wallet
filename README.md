@@ -102,15 +102,14 @@ Optionally, you can use an HPCS instance to encrypt/decrypt a wallet. To use an 
 
 - ZHSM: the domain name and the port number of the HPCS instance (e.g. ep11.{location}.hs-crypto.cloud.ibm.com:1234)
 - APIKEY: the api key for the HPCS instance (e.g. xxxxxxx-xxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)
-- INSTANCE_ID: the instance id of the HPCS instance (e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
 - IAM_ENDPOINT: the URL of an IAM endpoint (this is optional. a default value, https://iam.cloud.ibm.com, is used if not specified)
 
 If `ZHSM` is not defined, a default software AES is used.
-If `ZHSM` is defined but `APIKEY` or `INSTANCE_ID` is not, we assume the HPCS instance doesn't require authentication
+If `ZHSM` is defined but `APIKEY` is not, we assume the HPCS instance doesn't require authentication
 (typical for an on-prem instance).
 
 ```
-$ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY=${APIKEY} -e INSTANCE_ID=${INSTANCE_ID} --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
+$ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY=${APIKEY} --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
 ### Use a Web browser to access the electrum wallet.

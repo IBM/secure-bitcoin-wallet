@@ -7,20 +7,21 @@
     "require": {
         "php": "^7.3",
         "araneadev/laravel-electrum": "dev-local",
-        "laravel/framework": "^6.20.14",
+        "laravel/framework": "^8.0",
         "laravel/tinker": "^2.0",
-        "fideloper/proxy": "^4.0"
+        "fideloper/proxy": "^4.0",
+        "fruitcake/laravel-cors": "^2.0.2"
     },
     "require-dev": {
         "fakerphp/faker": "~1.4",
         "mockery/mockery": "^1.0",
         "phpunit/phpunit": "^9.0",
-        "laravel/ui": "^1.0"
+        "laravel/ui": "^3.0"
     },
     "repositories": [
 	{
 	    "type": "vcs",
-            "url": "https://github.com/tnakaike/laravel-electrum.git"
+	    "url": "https://github.com/tnakaike/laravel-electrum.git"
 	}
     ],
     "autoload": {
