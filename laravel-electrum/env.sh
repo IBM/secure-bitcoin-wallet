@@ -48,6 +48,8 @@ sed --in-place "s|DB_DATABASE=laravel|DB_DATABASE=$APP_ROOT/database/database.sq
 sed --in-place s/DB_USERNAME=root/\#DB_USERNAME=root/ .env
 sed --in-place s/DB_PASSWORD=/\#DB_PASSWORD=secret/ .env
 sed --in-place "s|APP_NAME=Laravel|APP_NAME=\"${TITLE}\"|" .env
+sed --in-place s/APP_DEBUG=.\*$/APP_DEBUG=false/ .env
+chmod 600 .env
 
 diff .env .env.orig
 
