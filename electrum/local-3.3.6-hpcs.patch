@@ -170,18 +170,9 @@ index 4defc052..52d75cb6 100644
      def help(self):
          # for the python console
 diff --git a/electrum/crypto.py b/electrum/crypto.py
-index a206abad..a47a8fc4 100644
+index a206abad..3ea8ad1b 100644
 --- a/electrum/crypto.py
 +++ b/electrum/crypto.py
-@@ -31,7 +31,7 @@ from typing import Union
- 
- import pyaes
- 
--from .util import assert_bytes, InvalidPassword, to_bytes, to_string, WalletFileException
-+from .util import assert_bytes, InvalidPassword, to_bytes, to_string, WalletFileException, HpcsError
- from .i18n import _
- 
- 
 @@ -40,6 +40,13 @@ try:
  except:
      AES = None
@@ -196,7 +187,7 @@ index a206abad..a47a8fc4 100644
  
  class InvalidPadding(Exception):
      pass
-@@ -67,6 +74,12 @@ def strip_PKCS7_padding(data: bytes) -> bytes:
+@@ -67,6 +74,10 @@ def strip_PKCS7_padding(data: bytes) -> bytes:
  def aes_encrypt_with_iv(key: bytes, iv: bytes, data: bytes) -> bytes:
      assert_bytes(key, iv, data)
      data = append_PKCS7_padding(data)
@@ -204,12 +195,10 @@ index a206abad..a47a8fc4 100644
 +        e = pyep11_aes.encrypt_with_iv(key, iv, data)
 +        if e is not None:
 +            return e
-+        else:
-+            raise HpcsError()
      if AES:
          e = AES.new(key, AES.MODE_CBC, iv).encrypt(data)
      else:
-@@ -78,6 +91,15 @@ def aes_encrypt_with_iv(key: bytes, iv: bytes, data: bytes) -> bytes:
+@@ -78,6 +89,13 @@ def aes_encrypt_with_iv(key: bytes, iv: bytes, data: bytes) -> bytes:
  
  def aes_decrypt_with_iv(key: bytes, iv: bytes, data: bytes) -> bytes:
      assert_bytes(key, iv, data)
@@ -220,8 +209,6 @@ index a206abad..a47a8fc4 100644
 +                return strip_PKCS7_padding(plaindata)
 +            except InvalidPadding:
 +                raise InvalidPassword()
-+        else:
-+            raise HpcsError()
      if AES:
          cipher = AES.new(key, AES.MODE_CBC, iv)
          data = cipher.decrypt(data)

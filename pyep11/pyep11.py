@@ -19,6 +19,8 @@ import os, sys, json, grpc, sqlite3, binascii, time
 import grep11consts as ep11, grep11_pb2, pkcs11_pb2, server_pb2, server_pb2_grpc, grep11_pb2_grpc 
 from subprocess import check_output
 
+from .util import HpcsError()
+
 endian = 'big'
 
 class AES:
@@ -162,6 +164,7 @@ class AES:
     def encrypt_with_iv(self, key, iv, data):
         # return None if there is no ZHSM
         if not self.channel:
+            print("no grpc channel configured")
             return None
         
         grep11ServerStub = server_pb2_grpc.CryptoStub(self.channel)
@@ -189,17 +192,18 @@ class AES:
         except grpc.RpcError as rpc_error:
             print(f'encrypt_with_iv: RPC failed with code {rpc_error.code()}: {rpc_error}')
             print('grpc error code=' + str(rpc_error._state.code) + ' ' + str(type(rpc_error._state.code)))
-            return None
+            raise HpcsError()
     
         except Exception as e:
             exc_type, exc_obj, tb = sys.exc_info()
             lineno = tb.tb_lineno
             print('Unexpected error: ' + str(e) + ' ' + str(type(e)) + ' at ' + str(lineno))
-            return None
+            raise HpcsError()
     
     def decrypt_with_iv(self, key, iv, encrypted_data):
         # return None if there is no ZHSM
         if not self.channel:
+            print("no grpc channel configured")
             return None
         
         grep11ServerStub = server_pb2_grpc.CryptoStub(self.channel)
@@ -227,12 +231,12 @@ class AES:
         except grpc.RpcError as rpc_error:
             print(f'decrypt_with_iv: RPC failed with code {rpc_error.code()}: {rpc_error}')
             print('grpc error code=' + str(rpc_error._state.code) + ' ' + str(type(rpc_error._state.code)))
-            return None
+            raise HpcsError()
     
         except Exception as e:
             exc_type, exc_obj, tb = sys.exc_info()
             lineno = tb.tb_lineno
             print('Unexpected error: ' + str(e) + ' ' + str(type(e)) + ' at ' + str(lineno))
-            return None
+            raise HpcsError()
     
 
