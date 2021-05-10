@@ -19,9 +19,11 @@ import os, sys, json, grpc, sqlite3, binascii, time
 import grep11consts as ep11, grep11_pb2, pkcs11_pb2, server_pb2, server_pb2_grpc, grep11_pb2_grpc 
 from subprocess import check_output
 
-from .util import HpcsError()
-
 endian = 'big'
+
+class HpcsError(Exception):
+    def __str__(self):
+        return ("HPCS/ZHSM error: check configuration parameters")
 
 class AES:
 
