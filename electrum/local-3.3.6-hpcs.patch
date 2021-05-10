@@ -1,5 +1,5 @@
 diff --git a/electrum/commands.py b/electrum/commands.py
-index 4defc052..52d75cb6 100644
+index 4defc052..c5659b4c 100644
 --- a/electrum/commands.py
 +++ b/electrum/commands.py
 @@ -292,7 +292,7 @@ class Commands:
@@ -103,8 +103,8 @@ index 4defc052..52d75cb6 100644
 +        storage = WalletStorage(self.config.get_wallet_path())
 +        storage.put('keystore', k.dump())
 +        storage.put('wallet_type', 'standard')
-+        wallet = Wallet(storage)
 +        try:
++            wallet = Wallet(storage)
 +            wallet.update_password(None, password, True)
 +        except Exception as e:
 +            return {'seed': '', 'msg': str(e)}
