@@ -56,12 +56,16 @@ $ sudo apt-get install -y git docker.io
 
 To build the application, clone the master branch from this repo and build a container out of it.
 If you just installed Docker in the VM, and if you want to build a container as a regular user,
-typically you need to add your userid to the `docker` group. 
+typically you need to add your userid to the `docker` group.
+
+The build process uses a personal access token for github.com to avoid a build failure due to its access rate limit.
+Refer to [an instruction](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) to create one.
+Store your access token into `ACCESS_TOKEN` environment variable.
 
 ```
 $ git clone https://github.com/IBM/secure-bitcoin-wallet.git
 $ cd secure-bitcoin-wallet
-$ docker build -t secure-bitcoin-wallet .
+$ docker build --build-arg ACCESS_TOKEN=${ACCESS_TOKEN} -t secure-bitcoin-wallet .
 ```
 
 By default, the Dockerfile installs grpc python packages, such as `grpcio-tools`, to access IBM Cloud Hyper Protect Crypto Services (HPCS).
@@ -70,7 +74,7 @@ This option allows you to build a container on a small VM, such as a free instan
 if you are not planning to use HPCS.
 
 ```
-$ docker build --build-arg NO_GRPC_BUILD=1 -t secure-bitcoin-wallet .
+$ docker build --build-arg NO_GRPC_BUILD=1 --build-arg ACCESS_TOKEN=${ACCESS_TOKEN} -t secure-bitcoin-wallet .
 ```
 
 ### How to run the application
@@ -98,15 +102,14 @@ Optionally, you can use an HPCS instance to encrypt/decrypt a wallet. To use an 
 
 - ZHSM: the domain name and the port number of the HPCS instance (e.g. ep11.{location}.hs-crypto.cloud.ibm.com:1234)
 - APIKEY: the api key for the HPCS instance (e.g. xxxxxxx-xxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx)
-- INSTANCE_ID: the instance id of the HPCS instance (e.g. xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx)
 - IAM_ENDPOINT: the URL of an IAM endpoint (this is optional. a default value, https://iam.cloud.ibm.com, is used if not specified)
 
 If `ZHSM` is not defined, a default software AES is used.
-If `ZHSM` is defined but `APIKEY` or `INSTANCE_ID` is not, we assume the HPCS instance doesn't require authentication
+If `ZHSM` is defined but `APIKEY` is not, we assume the HPCS instance doesn't require authentication
 (typical for an on-prem instance).
 
 ```
-$ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY=${APIKEY} -e INSTANCE_ID=${INSTANCE_ID} --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
+$ docker run -d -v ${WALLET_NAME}:/data -p ${PORT}:443 -e ZHSM=${ZHSM} -e APIKEY=${APIKEY} --name ${WALLET_NAME}-wallet secure-bitcoin-wallet
 ```
 
 ### Use a Web browser to access the electrum wallet.

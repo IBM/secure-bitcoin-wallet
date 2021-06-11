@@ -21,19 +21,21 @@ from subprocess import check_output
 
 endian = 'big'
 
+class HpcsError(Exception):
+    def __str__(self):
+        return ("HPCS/ZHSM error: check configuration parameters")
+
 class AES:
 
     def __init__(self):
         self.zhsm = os.environ.get('ZHSM')
         self.apikey = os.environ.get('APIKEY')
-        self.instance = os.environ.get('INSTANCE_ID')
         self.endpoint = os.environ.get('IAM_ENDPOINT', 'https://iam.cloud.ibm.com')
         self.channel = self.get_channel()
 
     class AuthPlugin(grpc.AuthMetadataPlugin):
         
-        def __init__(self, instance, apikey, endpoint):
-            self._instance = instance
+        def __init__(self, apikey, endpoint):
             self._apikey = apikey
             self._endpoint = endpoint
             self._access_token = ''
@@ -50,7 +52,7 @@ class AES:
                 self.get_access_token()
                 valid_for = int(self._expiration) - int(time.time())
                 print('new expiration=' + str(self._expiration) + ' valid for ' + str(valid_for) + ' sec')
-            metadata = (('authorization', 'Bearer {}'.format(self._access_token)),('bluemix-instance', '{}'.format(self._instance)),)
+            metadata = (('authorization', 'Bearer {}'.format(self._access_token)),)
             #print('metadata=' + str(metadata))
             callback(metadata, None)
 
@@ -58,7 +60,6 @@ class AES:
             print("*** get a new access token for an HPCS instance on IBM Cloud ***")
         
             # print("APIKEY=" + self._apikey)
-            # print("INSTANCE_ID=" + self._instance)
             print("ENDPOINT=" + self._endpoint)
     
             cmd = 'curl -sS -k -X POST --header "Content-Type: application/x-www-form-urlencoded" --header "Accept: application/json" --data-urlencode "grant_type=urn:ibm:params:oauth:grant-type:apikey" --data-urlencode "apikey=' + self._apikey + '" "' + self._endpoint + '/identity/token"'
@@ -92,17 +93,16 @@ class AES:
         if not self.zhsm:
             channel = None
             print("using a software crypto")
-        elif not self.apikey or not self.instance:
-            print("accessing an on-prem HPCS (grep11) at "  + self.zhsm + " - $APIKEY or $INSTANCE_ID environment variable is not set")
+        elif not self.apikey:
+            print("accessing an on-prem HPCS (grep11) at "  + self.zhsm + " - $APIKEY environment variable is not set")
             channel = grpc.insecure_channel(self.zhsm)
         else:
             print("accessing an HPCS instance on IBM Cloud at " + self.zhsm)
             print("ZHSM=" + self.zhsm)
             # print("APIKEY=" + self.apikey)
-            print("INSTANCE_ID=" + self.instance)
             print("ENDPOINT=" + self.endpoint)
 
-            call_credentials = grpc.metadata_call_credentials(self.AuthPlugin(self.instance, self.apikey, self.endpoint))
+            call_credentials = grpc.metadata_call_credentials(self.AuthPlugin(self.apikey, self.endpoint))
             channel_credential = grpc.ssl_channel_credentials()
             composite_credentials = grpc.composite_channel_credentials(channel_credential, call_credentials)
             channel = grpc.secure_channel(self.zhsm, composite_credentials)
@@ -166,6 +166,7 @@ class AES:
     def encrypt_with_iv(self, key, iv, data):
         # return None if there is no ZHSM
         if not self.channel:
+            print("no grpc channel configured")
             return None
         
         grep11ServerStub = server_pb2_grpc.CryptoStub(self.channel)
@@ -193,17 +194,18 @@ class AES:
         except grpc.RpcError as rpc_error:
             print(f'encrypt_with_iv: RPC failed with code {rpc_error.code()}: {rpc_error}')
             print('grpc error code=' + str(rpc_error._state.code) + ' ' + str(type(rpc_error._state.code)))
-            return None
+            raise HpcsError()
     
         except Exception as e:
             exc_type, exc_obj, tb = sys.exc_info()
             lineno = tb.tb_lineno
             print('Unexpected error: ' + str(e) + ' ' + str(type(e)) + ' at ' + str(lineno))
-            return None
+            raise HpcsError()
     
     def decrypt_with_iv(self, key, iv, encrypted_data):
         # return None if there is no ZHSM
         if not self.channel:
+            print("no grpc channel configured")
             return None
         
         grep11ServerStub = server_pb2_grpc.CryptoStub(self.channel)
@@ -231,12 +233,12 @@ class AES:
         except grpc.RpcError as rpc_error:
             print(f'decrypt_with_iv: RPC failed with code {rpc_error.code()}: {rpc_error}')
             print('grpc error code=' + str(rpc_error._state.code) + ' ' + str(type(rpc_error._state.code)))
-            return None
+            raise HpcsError()
     
         except Exception as e:
             exc_type, exc_obj, tb = sys.exc_info()
             lineno = tb.tb_lineno
             print('Unexpected error: ' + str(e) + ' ' + str(type(e)) + ' at ' + str(lineno))
-            return None
+            raise HpcsError()
     
 

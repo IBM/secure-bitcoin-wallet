@@ -1,0 +1,243 @@
+diff --git a/electrum/commands.py b/electrum/commands.py
+index 4defc052..c5659b4c 100644
+--- a/electrum/commands.py
++++ b/electrum/commands.py
+@@ -292,7 +292,7 @@ class Commands:
+         """Broadcast a transaction to the network. """
+         tx = Transaction(tx)
+         self.network.run_from_another_thread(self.network.broadcast_transaction(tx))
+-        return tx.txid()
++        return True, tx.txid()
+ 
+     @command('')
+     def createmultisig(self, num, pubkeys):
+@@ -511,7 +511,46 @@ class Commands:
+             from .exchange_rate import FxThread
+             fx = FxThread(self.config, None)
+             kwargs['fx'] = fx
+-        return json_encode(self.wallet.get_full_history(**kwargs))
++        # return json_encode(self.wallet.get_full_history(**kwargs))
++        balance = 0
++        out = []
++        for item in self.wallet.get_history():
++            tx_hash, tx_mined_status, value, balance = item
++            if tx_mined_status.timestamp:
++                date = datetime.datetime.fromtimestamp(tx_mined_status.timestamp).isoformat(' ')[:-3]
++            else:
++                date = "----"
++            label = self.wallet.get_label(tx_hash)
++            tx = self.wallet.db.get_transaction(tx_hash)
++            tx.deserialize()
++            input_addresses = []
++            output_addresses = []
++            for x in tx.inputs():
++                if x['type'] == 'coinbase': continue
++                addr = x.get('address')
++                if addr == None: continue
++                if addr == "(pubkey)":
++                    prevout_hash = x.get('prevout_hash')
++                    prevout_n = x.get('prevout_n')
++                    _addr = self.wallet.find_pay_to_pubkey_address(prevout_hash, prevout_n)
++                    if _addr:
++                        addr = _addr
++                input_addresses.append(addr)
++            for txout in tx.outputs():
++                _type, addr, amount = txout
++                output_addresses.append(addr)
++            out.append({
++                'txid': tx_hash,
++                'timestamp': tx_mined_status.timestamp,
++                'date': date,
++                'input_addresses': input_addresses,
++                'output_addresses': output_addresses,
++                'label': label,
++                'value': float(value)/COIN if value is not None else None,
++                'height': tx_mined_status.height,
++                'confirmations': tx_mined_status.conf
++            })
++        return out
+ 
+     @command('w')
+     def setlabel(self, key, label):
+@@ -760,6 +799,109 @@ class Commands:
+             "confirmations": self.wallet.get_tx_height(txid).conf,
+         }
+ 
++    @command('wp')
++    def getmax(self, destination, fee=None, from_addr=None, change_addr=None, nocheck=False, unsigned=False, rbf=None, password=None, locktime=None):
++        """Get the max amount that can be sent. """
++        amount = '!'
++        tx_fee = satoshis(fee)
++        domain = from_addr.split(',') if from_addr else None
++        tx = self._mktx([(destination, amount)], tx_fee, change_addr, domain, nocheck, True, rbf, password, locktime)
++        _type, address, amount = tx.outputs()[0]
++        value = float(amount) / COIN
++        return {'max': value}
++
++    @command('')
++    def create_from_seed(self, seed, password=None):
++        """Create a new wallet from an existing seed"""
++        print('create_from_seed')
++        print(str(password))
++        print(str(seed))
++        return self._create(seed, password)
++
++    @command('')
++    def create_new(self, password=None):
++        """Create a new wallet"""
++        print('create_new')
++        print(str(password))
++        return self._create(None, password)
++
++    def _create(self, seed=None, password=None):
++        import os
++        from electrum import keystore
++        from electrum.mnemonic import Mnemonic
++        from electrum import SimpleConfig
++        from electrum.storage import WalletStorage
++        from electrum.wallet import Wallet
++
++        if seed is None:
++            seed = Mnemonic('en').make_seed('standard')
++        k = keystore.from_seed(seed, '', False)
++        storage = WalletStorage(self.config.get_wallet_path())
++        storage.put('keystore', k.dump())
++        storage.put('wallet_type', 'standard')
++        try:
++            wallet = Wallet(storage)
++            wallet.update_password(None, password, True)
++        except Exception as e:
++            return {'seed': '', 'msg': str(e)}
++        wallet.synchronize()
++        print("Your wallet generation seed is:\n\"%s\"" % seed)
++        print("Please keep it in a safe place; if you lose it, you will not be able to restore your wallet.")
++        return {'seed': seed, 'msg': 'Your wallet created! Please load your wallet after recording your seed.'}
++
++    @command('')
++    def create_multisig_key(self, seed):
++        """Create a seed and a key for a multisig wallet"""
++        import os
++        print('create_multisig_key')
++        k = self._create_multisig_key(seed)
++        return {'seed': seed, 'key': k.get_master_public_key()}
++
++    @command('')
++    def create_new_multisig_key(self):
++        """Create a seed and a key for a multisig wallet"""
++        import os
++        from electrum.mnemonic import Mnemonic
++        print('create_new_multisig_key')
++        seed = Mnemonic('en').make_seed('standard')
++        k = self._create_multisig_key(seed)
++        return {'seed': seed, 'key': k.get_master_public_key()}
++
++    @command('')
++    def create_multisig_wallet(self, seed, cosignerkey, password=None):
++        """Create a new multisig wallet"""
++        import os
++        from electrum import keystore
++        from electrum.mnemonic import Mnemonic
++        from electrum import SimpleConfig
++        from electrum.storage import WalletStorage
++        from electrum.wallet import Wallet
++        from electrum.wallet import Multisig_Wallet
++        print('create_multisig_wallet: cosignerkey=' + cosignerkey)
++        k = self._create_multisig_key(seed)
++        ck = keystore.from_master_key(cosignerkey)
++        storage = WalletStorage(self.config.get_wallet_path())
++        storage.put('x1/', k.dump())
++        storage.put('x2/', ck.dump())
++        storage.put('wallet_type', '2of2')
++        storage.write()
++        wallet = Multisig_Wallet(storage)
++        wallet.update_password(None, password, True)
++        wallet.synchronize()
++        return {'seed': seed, 'key': k.get_master_public_key(), 'cosignerkey': cosignerkey}
++
++    def _create_multisig_key(self, seed=None):
++        import os
++        from electrum import keystore
++        from electrum.mnemonic import Mnemonic
++
++        if seed is None:
++            seed = Mnemonic('en').make_seed('standard')
++        k = keystore.from_seed(seed, '', True)
++        print("Your wallet generation seed is:\n\"%s\"" % seed)
++        print("Please keep it in a safe place; if you lose it, you will not be able to restore your wallet.")
++        return k
++
+     @command('')
+     def help(self):
+         # for the python console
+diff --git a/electrum/crypto.py b/electrum/crypto.py
+index a206abad..3ea8ad1b 100644
+--- a/electrum/crypto.py
++++ b/electrum/crypto.py
+@@ -40,6 +40,13 @@ try:
+ except:
+     AES = None
+ 
++# pyep11 encryption
++try:
++    import pyep11
++    pyep11_aes = pyep11.AES()
++except:
++    pyep11 = None
++    pyep11_aes = None
+ 
+ class InvalidPadding(Exception):
+     pass
+@@ -67,6 +74,10 @@ def strip_PKCS7_padding(data: bytes) -> bytes:
+ def aes_encrypt_with_iv(key: bytes, iv: bytes, data: bytes) -> bytes:
+     assert_bytes(key, iv, data)
+     data = append_PKCS7_padding(data)
++    if pyep11_aes:
++        e = pyep11_aes.encrypt_with_iv(key, iv, data)
++        if e is not None:
++            return e
+     if AES:
+         e = AES.new(key, AES.MODE_CBC, iv).encrypt(data)
+     else:
+@@ -78,6 +89,13 @@ def aes_encrypt_with_iv(key: bytes, iv: bytes, data: bytes) -> bytes:
+ 
+ def aes_decrypt_with_iv(key: bytes, iv: bytes, data: bytes) -> bytes:
+     assert_bytes(key, iv, data)
++    if pyep11_aes:
++        plaindata = pyep11_aes.decrypt_with_iv(key, iv, data)
++        if plaindata is not None:
++            try:
++                return strip_PKCS7_padding(plaindata)
++            except InvalidPadding:
++                raise InvalidPassword()
+     if AES:
+         cipher = AES.new(key, AES.MODE_CBC, iv)
+         data = cipher.decrypt(data)
+diff --git a/electrum/wallet.py b/electrum/wallet.py
+index a3837952..65dba65a 100644
+--- a/electrum/wallet.py
++++ b/electrum/wallet.py
+@@ -1887,7 +1887,10 @@ def create_new_wallet(*, path, passphrase=None, password=None, encrypt_file=True
+     storage.put('keystore', k.dump())
+     storage.put('wallet_type', 'standard')
+     wallet = Wallet(storage)
+-    wallet.update_password(old_pw=None, new_pw=password, encrypt_storage=encrypt_file)
++    try:
++        wallet.update_password(old_pw=None, new_pw=password, encrypt_storage=encrypt_file)
++    except Exception as e:
++         return {'seed': seed, 'wallet': wallet, 'msg': str(e)}
+     wallet.synchronize()
+     msg = "Please keep your seed in a safe place; if you lose it, you will not be able to restore your wallet."
+ 
+diff --git a/run_electrum b/run_electrum
+index 654cf15f..1c0d3bc1 100755
+--- a/run_electrum
++++ b/run_electrum
+@@ -158,7 +158,7 @@ def init_cmdline(config_options, server):
+ 
+     # commands needing password
+     if (cmd.requires_wallet and storage.is_encrypted() and server is None)\
+-       or (cmd.requires_password and (storage.get('use_encryption') or storage.is_encrypted())):
++       or (cmd.requires_password and (storage.is_encrypted())):
+         if storage.is_encrypted_with_hw_device():
+             # this case is handled later in the control flow
+             password = None
