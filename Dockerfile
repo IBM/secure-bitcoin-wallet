@@ -15,7 +15,7 @@
 ##############################################################################
 FROM node:16-buster-slim AS node
 
-FROM python:slim-buster
+FROM python:3.9.7-slim-buster
 
 COPY --from=node /usr/local /usr/local
 
