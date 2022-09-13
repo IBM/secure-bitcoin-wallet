@@ -44,23 +44,23 @@ else
     ./run_electrum ${NETWORK} setconfig rpchost 0.0.0.0
     ./run_electrum ${NETWORK} setconfig rpcport 7777
 
-    ./run_electrum daemon ${VERBOSE} ${NETWORK} 1> /tmp/electrum-daemon.log 2> /tmp/electrum-daemon.err &
+    ./run_electrum daemon ${VERBOSE} ${NETWORK} --noonion 1> /tmp/electrum-daemon.log 2> /tmp/electrum-daemon.err &
 
     daemon_pid=$!
     echo $daemon_pid
     sleep 3
     
     if [[ -z "${WALLET}" || ! -e "${WALLET}" ]]; then
-	./run_electrum daemon ${VERBOSE} ${NETWORK} status
+	./run_electrum daemon ${VERBOSE} ${NETWORK} --noonion status
     else
 	echo ${PASSWORD} > /tmp/pass
 	if [[ -z "${MULTISIG}" ]]; then
-	    ./run_electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} load_wallet < /tmp/pass 1> /tmp/load-wallet.log 2> /tmp/load-wallet.err
+	    ./run_electrum daemon ${VERBOSE} ${NETWORK} --noonion --wallet ${WALLET} load_wallet < /tmp/pass 1> /tmp/load-wallet.log 2> /tmp/load-wallet.err
 	else
-	    ./run_electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} load_multisig_wallet < /tmp/pass 1> /tmp/load-multisig-wallet.log 2> /tmp/load-multisig-wallet.err
+	    ./run_electrum daemon ${VERBOSE} ${NETWORK} --noonion --wallet ${WALLET} load_multisig_wallet < /tmp/pass 1> /tmp/load-multisig-wallet.log 2> /tmp/load-multisig-wallet.err
 	fi
 	rm /tmp/pass
-	./run_electrum daemon ${VERBOSE} ${NETWORK} --wallet ${WALLET} status
+	./run_electrum daemon ${VERBOSE} ${NETWORK} --noonion --wallet ${WALLET} status
     fi
     sleep 3
     wait $daemon_pid
