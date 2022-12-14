@@ -13,7 +13,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 ##############################################################################
-FROM node:16-buster-slim AS node
+FROM node:16.4-buster-slim AS node
 
 FROM python:3.9.7-slim-buster
 
@@ -64,8 +64,9 @@ RUN git clone https://github.com/spesmilo/electrum.git && \
     pip3 install . && \
     protoc --proto_path=electrum --python_out=electrum electrum/paymentrequest.proto && \
     cd /git/pyep11 && \
+    pip3 install protobuf==3.19.4 && \
     if [ -z "$NO_GRPC_BUILD" ]; then \
-       pip3 install grpclib grpcio-tools; \
+       pip3 install grpclib grpcio-tools==1.44.0; \
        python3 -m grpc_tools.protoc common/protos/*.proto generated/protos/*.proto \
               vendor/github.com/gogo/protobuf/gogoproto/*.proto \
               vendor/github.com/gogo/googleapis/google/api/*.proto \
